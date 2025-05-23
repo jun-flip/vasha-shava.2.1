@@ -44,184 +44,80 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <PromoBanner />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center">
+    <main className="min-h-screen bg-[#181818] flex flex-col items-center justify-between">
+      <section className="w-full relative bg-black pb-20 pt-16 md:pt-24">
+        <div className="max-w-4xl mx-auto px-4 flex flex-col items-center text-center">
           <motion.h1
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl"
+            transition={{ duration: 0.7 }}
+            className="text-5xl md:text-7xl font-extrabold text-white drop-shadow-lg mb-4 tracking-tight graffiti-title"
           >
-            <span className="block">Ваша шаурма</span>
-            <span className="block text-[#6de082]">без очередей</span>
+            Ваша шаурма
           </motion.h1>
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.7 }}
+            className="text-3xl md:text-4xl font-black text-[#6de082] mb-6 graffiti-subtitle"
+          >
+            STREET FOOD
+          </motion.h2>
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="mt-3 max-w-md mx-auto text-base text-gray-300 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl"
+            transition={{ delay: 0.4, duration: 0.7 }}
+            className="max-w-xl mx-auto text-lg md:text-2xl text-gray-200 mb-8 font-semibold"
           >
-            любовь с первого укуса
+            Любовь с первого укуса. Без очередей. Только уличный вайб.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-            className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8"
+            transition={{ delay: 0.6, duration: 0.7 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <div className="rounded-md shadow">
-              <Link
-                href="/menu"
-                className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#6de082] hover:bg-[#5bc06f] md:py-4 md:text-lg md:px-10"
-              >
-                МЕНЮ
-              </Link>
-            </div>
+            <Link
+              href="/menu"
+              className="px-10 py-4 rounded-full bg-[#6de082] text-black font-extrabold text-xl shadow-xl border-4 border-black hover:bg-black hover:text-[#6de082] hover:border-[#6de082] transition-colors duration-200 graffiti-btn"
+            >
+              МЕНЮ
+            </Link>
+            <span className={`inline-block px-6 py-2 rounded-full font-bold text-base border-2 border-[#6de082] text-[#6de082] bg-black/70 ml-0 sm:ml-2 graffiti-sticker`}>{isOpen ? 'Открыто' : 'Закрыто'}</span>
           </motion.div>
         </div>
-
-        <div className="mt-16">
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-              className="pt-6 h-full"
-            >
-              <div className="flow-root bg-white rounded-lg px-6 pb-4 h-full flex flex-col">
-                <div className="-mt-6 flex-grow">
-                  <div>
-                    <span className="inline-flex items-center justify-center p-3 bg-[#6de082] rounded-md shadow-lg">
-                      <svg
-                        className="h-6 w-6 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                      </svg>
-                    </span>
-                  </div>
-                  <h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">
-                    На Свободе
-                  </h3>
-                  <p className="mt-2 text-base text-gray-500">
-                    ул. Площадь Свободы, 6А
-                  </p>
-                  <p className="mt-2 text-base text-gray-500">
-                    09:00 - 21:00
-                  </p>
-                  <p className={`mt-2 text-base font-medium ${isOpen ? 'text-[#6de082]' : 'text-red-500'}`}>
-                    {isOpen ? 'Открыто' : 'Закрыто'}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 0.5 }}
-              className="pt-6 h-full"
-            >
-              <div className="flow-root bg-white rounded-lg px-6 pb-4 h-full flex flex-col">
-                <div className="-mt-6 flex-grow">
-                  <div>
-                    <span className="inline-flex items-center justify-center p-3 bg-[#6de082] rounded-md shadow-lg">
-                      <svg
-                        className="h-6 w-6 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                      </svg>
-                    </span>
-                  </div>
-                  <h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">
-                    На Сибирской
-                  </h3>
-                  <p className="mt-2 text-base text-gray-500">
-                    ул. Сибирская, 6
-                  </p>
-                  <p className="mt-2 text-base text-gray-500">
-                    09:00 - 21:00
-                  </p>
-                  <p className={`mt-2 text-base font-medium ${isOpen ? 'text-[#6de082]' : 'text-red-500'}`}>
-                    {isOpen ? 'Открыто' : 'Закрыто'}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1, duration: 0.5 }}
-              className="pt-6 h-full"
-            >
-              <div className="flow-root bg-white rounded-lg px-6 pb-4 h-full flex flex-col">
-                <div className="-mt-6 flex-grow">
-                  <div>
-                    <span className="inline-flex items-center justify-center p-3 bg-[#6de082] rounded-md shadow-lg">
-                      <svg
-                        className="h-6 w-6 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-                        />
-                      </svg>
-                    </span>
-                  </div>
-                  <h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">
-                    Предзаказ
-                  </h3>
-                  <p className="mt-2 text-base text-gray-500">
-                    Закажи за ранее
-                  </p>
-                  <p className="mt-2 text-base text-gray-500">
-                    Среднее время приготовления<br /><span className="text-[#6de082]">5 минут</span>
-                  </p>
-                  <div className="mt-8"></div>
-                </div>
-              </div>
-            </motion.div>
+        {/* Граффити-деталь */}
+        <div className="absolute left-0 bottom-0 w-40 h-40 md:w-64 md:h-64 pointer-events-none select-none opacity-60">
+          <Image src="/graffiti1.png" alt="graffiti" fill className="object-contain" />
+        </div>
+        <div className="absolute right-0 top-0 w-32 h-32 md:w-48 md:h-48 pointer-events-none select-none opacity-60">
+          <Image src="/graffiti2.png" alt="graffiti" fill className="object-contain" />
+        </div>
+      </section>
+      <section className="w-full max-w-5xl mx-auto px-4 py-16">
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.7 }}
+          className="text-3xl md:text-4xl font-extrabold text-white mb-10 graffiti-title"
+        >
+          Где нас найти?
+        </motion.h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="bg-[#232323] rounded-2xl p-8 shadow-xl border-2 border-[#6de082] flex flex-col items-start graffiti-card">
+            <h3 className="text-2xl font-bold text-[#6de082] mb-2">На Свободе</h3>
+            <p className="text-gray-200 mb-1">ул. Площадь Свободы, 6А</p>
+            <p className="text-gray-400 mb-1">09:00 - 21:00</p>
+            <span className={`inline-block mt-2 px-4 py-1 rounded-full font-bold text-sm border-2 border-[#6de082] text-[#6de082] bg-black/70 graffiti-sticker`}>{isOpen ? 'Открыто' : 'Закрыто'}</span>
+          </div>
+          <div className="bg-[#232323] rounded-2xl p-8 shadow-xl border-2 border-[#6de082] flex flex-col items-start graffiti-card">
+            <h3 className="text-2xl font-bold text-[#6de082] mb-2">На Сибирской</h3>
+            <p className="text-gray-200 mb-1">ул. Сибирская, 6</p>
+            <p className="text-gray-400 mb-1">09:00 - 21:00</p>
+            <span className={`inline-block mt-2 px-4 py-1 rounded-full font-bold text-sm border-2 border-[#6de082] text-[#6de082] bg-black/70 graffiti-sticker`}>{isOpen ? 'Открыто' : 'Закрыто'}</span>
           </div>
         </div>
-      </div>
+      </section>
     </main>
   );
 }
