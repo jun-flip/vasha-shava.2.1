@@ -16,23 +16,32 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Загрузка корзины из localStorage при монтировании
   useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      try {
-        setItems(JSON.parse(savedCart));
-      } catch (error) {
-        console.error('Ошибка при загрузке корзины:', error);
+    if (isClient) {
+      const savedCart = localStorage.getItem('cart');
+      if (savedCart) {
+        try {
+          setItems(JSON.parse(savedCart));
+        } catch (error) {
+          console.error('Ошибка при загрузке корзины:', error);
+        }
       }
     }
-  }, []);
+  }, [isClient]);
 
   // Сохранение корзины в localStorage при изменении
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(items));
-  }, [items]);
+    if (isClient) {
+      localStorage.setItem('cart', JSON.stringify(items));
+    }
+  }, [items, isClient]);
 
   const addItem = (newItem: CartItem) => {
     setItems(prevItems => {
