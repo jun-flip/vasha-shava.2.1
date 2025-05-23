@@ -14,7 +14,7 @@ export function MenuItem({ item }: MenuItemProps) {
   const { addItem } = useCart();
   const [isHovered, setIsHovered] = useState(false);
   const [isAdditivesOpen, setIsAdditivesOpen] = useState(false);
-  const [selectedAdditives, setSelectedAdditives] = useState<number[]>([]);
+  const [selectedAdditives, setSelectedAdditives] = useState<string[]>([]);
 
   const handleAddToCart = () => {
     const selectedAdditivesList = item.additives?.filter(additive => 
@@ -35,7 +35,7 @@ export function MenuItem({ item }: MenuItemProps) {
     });
   };
 
-  const toggleAdditive = (additiveId: number) => {
+  const toggleAdditive = (additiveId: string) => {
     setSelectedAdditives(prev => 
       prev.includes(additiveId)
         ? prev.filter(id => id !== additiveId)
@@ -58,6 +58,7 @@ export function MenuItem({ item }: MenuItemProps) {
           alt={item.name}
           fill
           className="object-cover"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
         {item.isSpicy && (
           <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-sm">

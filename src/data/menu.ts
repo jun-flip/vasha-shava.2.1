@@ -1,16 +1,16 @@
 import { MenuItem } from '../types';
 
 const commonAdditives = [
-  { id: 1, name: 'Сыр Гауда', price: 30 },
-  { id: 2, name: 'Пармезан', price: 40 },
-  { id: 3, name: 'Краснодарский сыр', price: 35 },
-  { id: 4, name: 'Огурцы', price: 15 },
-  { id: 5, name: 'Помидоры', price: 15 },
-  { id: 6, name: 'Болгарский перец', price: 20 },
-  { id: 7, name: 'Лук', price: 10 },
-  { id: 8, name: 'Соус барбекю', price: 20 },
-  { id: 9, name: 'Соус карри', price: 25 },
-  { id: 10, name: 'Соус тахини', price: 25 }
+  { id: 'additive-1', name: 'Сыр Гауда', price: 30 },
+  { id: 'additive-2', name: 'Пармезан', price: 40 },
+  { id: 'additive-3', name: 'Краснодарский сыр', price: 35 },
+  { id: 'additive-4', name: 'Огурцы', price: 15 },
+  { id: 'additive-5', name: 'Помидоры', price: 15 },
+  { id: 'additive-6', name: 'Болгарский перец', price: 20 },
+  { id: 'additive-7', name: 'Лук', price: 10 },
+  { id: 'additive-8', name: 'Соус барбекю', price: 20 },
+  { id: 'additive-9', name: 'Соус карри', price: 25 },
+  { id: 'additive-10', name: 'Соус тахини', price: 25 }
 ];
 
 export const menuItems: MenuItem[] = [
