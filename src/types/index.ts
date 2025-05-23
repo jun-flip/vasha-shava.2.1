@@ -1,7 +1,7 @@
 export type Category = 'all' | 'spicy' | 'vegetarian' | 'drinks' | 'combo' | 'new';
 
 export interface Additive {
-  id: number;
+  id: string;
   name: string;
   price: number;
   image?: string;
@@ -9,7 +9,7 @@ export interface Additive {
 }
 
 export interface MenuItem {
-  id: number;
+  id: string;
   name: string;
   description: string;
   price: number;
@@ -38,7 +38,7 @@ export interface CartItem {
 }
 
 export interface Review {
-  id: number;
+  id: string;
   userId: string;
   userName: string;
   rating: number;
@@ -53,7 +53,7 @@ export interface User {
   email: string;
   phone?: string;
   address?: string;
-  favoriteItems?: number[];
+  favoriteItems?: string[];
   orderHistory?: Order[];
   loyaltyPoints?: number;
 }
@@ -75,7 +75,7 @@ export interface Order {
 }
 
 export interface Combo {
-  id: number;
+  id: string;
   name: string;
   description: string;
   price: number;
@@ -86,7 +86,7 @@ export interface Combo {
 }
 
 export interface Promotion {
-  id: number;
+  id: string;
   code: string;
   description: string;
   discount: number;
