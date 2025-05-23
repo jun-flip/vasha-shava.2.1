@@ -8,8 +8,8 @@ export type CartItem = {
   name: string;
   price: number;
   image: string;
+  selectedAdditives: Additive[];
   quantity?: number;
-  selectedAdditives?: Additive[];
 };
 
 type CartContextType = {
@@ -18,65 +18,46 @@ type CartContextType = {
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
-  totalItems: number;
-  totalPrice: number;
+  total: number;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
-  const [isClient, setIsClient] = useState(false);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
-    setIsClient(true);
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
-      try {
-        setItems(JSON.parse(savedCart));
-      } catch (error) {
-        console.error('Ошибка при загрузке корзины:', error);
-      }
+      setItems(JSON.parse(savedCart));
     }
   }, []);
 
   useEffect(() => {
-    if (isClient) {
-      localStorage.setItem('cart', JSON.stringify(items));
-    }
-  }, [items, isClient]);
+    localStorage.setItem('cart', JSON.stringify(items));
+    const newTotal = items.reduce((sum, item) => {
+      const itemTotal = item.price * (item.quantity || 1);
+      const additivesTotal = item.selectedAdditives.reduce(
+        (additiveSum, additive) => additiveSum + additive.price * (item.quantity || 1),
+        0
+      );
+      return sum + itemTotal + additivesTotal;
+    }, 0);
+    setTotal(newTotal);
+  }, [items]);
 
   const addItem = (item: CartItem) => {
-    setItems(prevItems => {
-      // Проверяем, есть ли уже такой товар с такими же добавками
-      const existingItem = prevItems.find(i => i.id === item.id);
-      
-      if (existingItem) {
-        // Если товар с такими же добавками уже есть, увеличиваем количество
-        return prevItems.map(i =>
-          i.id === item.id
-            ? { ...i, quantity: (i.quantity || 1) + 1 }
-            : i
-        );
-      }
-      
-      // Если такого товара с такими добавками нет, добавляем новую позицию
-      return [...prevItems, { ...item, quantity: 1 }];
-    });
+    setItems((prevItems) => [...prevItems, item]);
   };
 
   const removeItem = (id: string) => {
-    setItems(prevItems => prevItems.filter(item => item.id !== id));
+    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
   const updateQuantity = (id: string, quantity: number) => {
-    if (quantity < 1) {
-      removeItem(id);
-      return;
-    }
-
-    setItems(prevItems =>
-      prevItems.map(item =>
+    setItems((prevItems) =>
+      prevItems.map((item) =>
         item.id === id ? { ...item, quantity } : item
       )
     );
@@ -86,18 +67,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems([]);
   };
 
-  const totalItems = items.length;
-  const totalPrice = items.reduce((sum, item) => {
-    const itemTotal = item.price * (item.quantity || 1);
-    const additivesTotal = (item.selectedAdditives || []).reduce(
-      (additiveSum, additive) => additiveSum + additive.price * (item.quantity || 1),
-      0
-    );
-    return sum + itemTotal + additivesTotal;
-  }, 0);
-
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart, totalItems, totalPrice }}>
+    <CartContext.Provider
+      value={{ items, addItem, removeItem, updateQuantity, clearCart, total }}
+    >
       {children}
     </CartContext.Provider>
   );
