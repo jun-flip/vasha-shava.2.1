@@ -34,7 +34,7 @@ export default function Home() {
 
   const handleAddToCart = (item: MenuItemType) => {
     addItem({
-      id: item.id,
+      id: String(item.id),
       name: item.name,
       price: item.price,
       image: item.image
