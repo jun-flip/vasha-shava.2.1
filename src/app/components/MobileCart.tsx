@@ -10,7 +10,7 @@ interface MobileCartProps {
 }
 
 export function MobileCart({ isOpen, onClose }: MobileCartProps) {
-  const { items, removeFromCart, totalPrice } = useCart();
+  const { items, removeItem, total } = useCart();
 
   return (
     <AnimatePresence>
@@ -85,7 +85,7 @@ export function MobileCart({ isOpen, onClose }: MobileCartProps) {
                           <div className="flex items-center justify-between mt-2">
                             <span className="font-medium">{item.price} ₽</span>
                             <button
-                              onClick={() => removeFromCart(item.id)}
+                              onClick={() => removeItem(item.id)}
                               className="text-red-500 hover:text-red-600 transition-colors"
                             >
                               Удалить
@@ -102,7 +102,7 @@ export function MobileCart({ isOpen, onClose }: MobileCartProps) {
                 <div className="border-t p-4">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-lg font-medium">Итого:</span>
-                    <span className="text-xl font-bold">{totalPrice} ₽</span>
+                    <span className="text-xl font-bold">{total} ₽</span>
                   </div>
                   <motion.button
                     whileHover={{ scale: 1.02 }}

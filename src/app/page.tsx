@@ -38,7 +38,8 @@ export default function Home() {
       id: item.id.toString(),
       name: item.name,
       price: item.price,
-      image: item.image
+      image: item.image,
+      selectedAdditives: [],
     });
   };
 
