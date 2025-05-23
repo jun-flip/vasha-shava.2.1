@@ -10,8 +10,8 @@ interface UserContextType {
   logout: () => void;
   register: (userData: Partial<User>) => Promise<void>;
   updateProfile: (userData: Partial<User>) => Promise<void>;
-  addToFavorites: (itemId: number) => void;
-  removeFromFavorites: (itemId: number) => void;
+  addToFavorites: (itemId: string) => void;
+  removeFromFavorites: (itemId: string) => void;
   getOrderHistory: () => Order[];
 }
 
@@ -19,27 +19,36 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // Загрузка данных пользователя из localStorage при монтировании
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (error) {
-        console.error('Ошибка при загрузке данных пользователя:', error);
-      }
-    }
+    setIsClient(true);
   }, []);
 
   useEffect(() => {
-    // Сохранение данных пользователя в localStorage при изменении
-    if (user) {
-      localStorage.setItem('user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('user');
+    // Загрузка данных пользователя из localStorage при монтировании
+    if (isClient) {
+      const savedUser = localStorage.getItem('user');
+      if (savedUser) {
+        try {
+          setUser(JSON.parse(savedUser));
+        } catch (error) {
+          console.error('Ошибка при загрузке данных пользователя:', error);
+        }
+      }
     }
-  }, [user]);
+  }, [isClient]);
+
+  useEffect(() => {
+    // Сохранение данных пользователя в localStorage при изменении
+    if (isClient) {
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user));
+      } else {
+        localStorage.removeItem('user');
+      }
+    }
+  }, [user, isClient]);
 
   const login = async (email: string, password: string) => {
     // TODO: Реализовать реальную аутентификацию
@@ -77,14 +86,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const addToFavorites = (itemId: number) => {
+  const addToFavorites = (itemId: string) => {
     if (user) {
       const updatedFavorites = [...(user.favoriteItems || []), itemId];
       setUser({ ...user, favoriteItems: updatedFavorites });
     }
   };
 
-  const removeFromFavorites = (itemId: number) => {
+  const removeFromFavorites = (itemId: string) => {
     if (user) {
       const updatedFavorites = (user.favoriteItems || []).filter(id => id !== itemId);
       setUser({ ...user, favoriteItems: updatedFavorites });
