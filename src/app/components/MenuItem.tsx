@@ -7,32 +7,33 @@ import { useCart } from '../context/CartContext';
 import { Additive } from '../../types';
 
 interface MenuItemProps {
-  item: {
-    id: string;
-    name: string;
-    description: string;
-    price: number;
-    image: string;
-    category: string;
-    isSpicy?: boolean;
-    additives?: Additive[];
-  };
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  onSelect: (id: string, selected: boolean) => void;
 }
 
-export function MenuItem({ item }: MenuItemProps) {
+export function MenuItem({ id, name, price, image, onSelect }: MenuItemProps) {
   const { addItem } = useCart();
   const [showAddToCartAnimation, setShowAddToCartAnimation] = useState(false);
+  const [isSelected, setIsSelected] = useState(false);
 
   const handleAddToCart = () => {
     addItem({
-      id: item.id,
-      name: item.name,
-      price: item.price,
-      image: item.image,
+      id: id,
+      name: name,
+      price: price,
+      image: image,
       selectedAdditives: [],
     });
     setShowAddToCartAnimation(true);
     setTimeout(() => setShowAddToCartAnimation(false), 1200);
+  };
+
+  const handleCheckboxChange = () => {
+    setIsSelected(!isSelected);
+    onSelect(id, !isSelected);
   };
 
   return (
@@ -42,30 +43,22 @@ export function MenuItem({ item }: MenuItemProps) {
     >
       <div className="relative w-full h-56 sm:h-64 md:h-56 overflow-hidden">
         <Image
-          src={item.image}
-          alt={item.name}
+          src={image}
+          alt={name}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        {item.isSpicy && (
-          <span className="absolute top-3 left-3 bg-red-600 text-white text-xs font-extrabold px-3 py-1 rounded-full shadow-lg tracking-widest rotate-[-8deg] border-2 border-white">
-            ОСТРОЕ
-          </span>
-        )}
       </div>
       <div className="flex-1 flex flex-col justify-between p-5">
         <div>
           <h3 className="text-2xl font-extrabold text-white mb-2 tracking-tight drop-shadow-lg">
-            {item.name}
+            {name}
           </h3>
           <p className="text-gray-300 text-base font-medium mb-4 line-clamp-3">
-            {item.description}
+            {price} ₽
           </p>
         </div>
         <div className="flex items-end justify-between mt-auto">
-          <span className="text-2xl font-black text-[#6de082] drop-shadow-lg">
-            {item.price} ₽
-          </span>
           <motion.button
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.96 }}
@@ -75,6 +68,15 @@ export function MenuItem({ item }: MenuItemProps) {
             В корзину
           </motion.button>
         </div>
+      </div>
+      <div className="flex items-center p-5">
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={handleCheckboxChange}
+          className="w-5 h-5 text-[#6de082] border-2 border-[#6de082] rounded focus:outline-none"
+        />
+        <label className="ml-2 text-white font-bold">Добавить в заказ</label>
       </div>
       <AnimatePresence>
         {showAddToCartAnimation && (

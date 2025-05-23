@@ -3,7 +3,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 
-export function OrderForm() {
+interface OrderFormProps {
+  onClose: () => void;
+}
+
+export function OrderForm({ onClose }: OrderFormProps) {
   const [formData, setFormData] = useState({
     name: '',
     address: '',
@@ -14,10 +18,34 @@ export function OrderForm() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Здесь будет логика отправки заказа
-    console.log(formData);
+    const message = `Новый заказ:\nИмя: ${formData.name}\nТелефон: ${formData.phone}\nАдрес: ${formData.address}`;
+    const botToken = '7955773373:AAEKm-UWGKW5WDZCGDcjpzYhedFXN6cO7QE';
+    const chatId = 'YOUR_CHAT_ID'; // Замените на ID вашей группы
+
+    try {
+      const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message,
+        }),
+      });
+
+      if (response.ok) {
+        alert('Заказ успешно отправлен!');
+        onClose();
+      } else {
+        alert('Ошибка при отправке заказа. Попробуйте позже.');
+      }
+    } catch (error) {
+      console.error('Error sending order:', error);
+      alert('Ошибка при отправке заказа. Попробуйте позже.');
+    }
   };
 
   return (
