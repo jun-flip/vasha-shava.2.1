@@ -1,13 +1,13 @@
 export type Category = 'all' | 'spicy' | 'vegetarian' | 'drinks';
 
 export interface Additive {
-  id: number;
+  id: string;
   name: string;
   price: number;
 }
 
 export interface MenuItem {
-  id: number;
+  id: string;
   name: string;
   description: string;
   price: number;

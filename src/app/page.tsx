@@ -8,6 +8,7 @@ import { MenuItem } from "./components/MenuItem";
 import { motion } from "framer-motion";
 import Link from 'next/link';
 import Image from 'next/image';
+import { PromoBanner } from './components/PromoBanner';
 
 export default function Home() {
   const { addItem } = useCart();
@@ -42,7 +43,8 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen">
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <PromoBanner />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center">
           <motion.h1

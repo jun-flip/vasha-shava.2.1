@@ -1,24 +1,35 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { CartItem, Additive } from '../../types';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { Additive } from '../../types';
 
-interface CartContextType {
+export type CartItem = {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  quantity?: number;
+  selectedAdditives?: Additive[];
+};
+
+type CartContextType = {
   items: CartItem[];
   addItem: (item: CartItem) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
-  total: number;
   clearCart: () => void;
-}
+  totalItems: number;
+  totalPrice: number;
+};
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export function CartProvider({ children }: { children: ReactNode }) {
+export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [isClient, setIsClient] = useState(false);
 
-  // Загрузка корзины из localStorage при монтировании
   useEffect(() => {
+    setIsClient(true);
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
       try {
@@ -29,27 +40,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Сохранение корзины в localStorage при изменении
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(items));
-  }, [items]);
+    if (isClient) {
+      localStorage.setItem('cart', JSON.stringify(items));
+    }
+  }, [items, isClient]);
 
-  const addItem = (newItem: CartItem) => {
+  const addItem = (item: CartItem) => {
     setItems(prevItems => {
       // Проверяем, есть ли уже такой товар с такими же добавками
-      const existingItem = prevItems.find(item => item.id === newItem.id);
+      const existingItem = prevItems.find(i => i.id === item.id);
       
       if (existingItem) {
         // Если товар с такими же добавками уже есть, увеличиваем количество
-        return prevItems.map(item =>
-          item.id === newItem.id
-            ? { ...item, quantity: (item.quantity || 1) + 1 }
-            : item
+        return prevItems.map(i =>
+          i.id === item.id
+            ? { ...i, quantity: (i.quantity || 1) + 1 }
+            : i
         );
       }
       
       // Если такого товара с такими добавками нет, добавляем новую позицию
-      return [...prevItems, { ...newItem, quantity: 1 }];
+      return [...prevItems, { ...item, quantity: 1 }];
     });
   };
 
@@ -74,7 +86,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems([]);
   };
 
-  const total = items.reduce((sum, item) => {
+  const totalItems = items.length;
+  const totalPrice = items.reduce((sum, item) => {
     const itemTotal = item.price * (item.quantity || 1);
     const additivesTotal = (item.selectedAdditives || []).reduce(
       (additiveSum, additive) => additiveSum + additive.price * (item.quantity || 1),
@@ -84,7 +97,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, 0);
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, total, clearCart }}>
+    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart, totalItems, totalPrice }}>
       {children}
     </CartContext.Provider>
   );
