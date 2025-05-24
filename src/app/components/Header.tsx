@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useCart } from '../context/CartContext';
 import { motion } from 'framer-motion';
 import { ShoppingCart } from 'lucide-react';
+import Image from 'next/image';
 
 export function Header() {
   const { items } = useCart();
@@ -18,52 +19,66 @@ export function Header() {
 
   return (
     <header className="bg-[#5f2dab] shadow-lg border-b-2 border-[#6de082]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <Link href="/" className="text-2xl font-extrabold text-[#6de082] graffiti-title">
-            Ваша Шава
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="flex flex-col items-center gap-4">
+          <Link href="/" className="w-24 h-24 relative">
+            <Image
+              src="/Logo.png"
+              alt="Logo"
+              fill
+              className="object-contain"
+              priority
+            />
           </Link>
-          <nav className="hidden md:flex space-x-8">
-            {menuItems.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
+          <div className="flex items-center justify-between w-full">
+            <nav className="hidden md:flex space-x-8">
+              {menuItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="text-gray-300 hover:text-[#6de082] font-bold transition-colors duration-200"
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </nav>
+            <div className="flex items-center space-x-4">
+              <a
+                href="tel:+79991234567"
                 className="text-gray-300 hover:text-[#6de082] font-bold transition-colors duration-200"
               >
-                {item.name}
-              </Link>
-            ))}
-          </nav>
-          <div className="flex items-center space-x-4">
-            <Link
-              href="/cart"
-              className="relative p-2 text-gray-300 hover:text-[#6de082] transition-colors duration-200"
-            >
-              <ShoppingCart className="w-6 h-6" />
-              {items.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#6de082] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                  {items.length}
-                </span>
-              )}
-            </Link>
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 text-gray-300 hover:text-[#6de082] transition-colors duration-200"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+                Позвонить
+              </a>
+              <Link
+                href="/cart"
+                className="relative p-2 text-gray-300 hover:text-[#6de082] transition-colors duration-200"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
+                <ShoppingCart className="w-6 h-6" />
+                {items.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-[#6de082] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                    {items.length}
+                  </span>
+                )}
+              </Link>
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="md:hidden p-2 text-gray-300 hover:text-[#6de082] transition-colors duration-200"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>

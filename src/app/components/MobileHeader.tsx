@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '../context/CartContext';
 import { Menu, X, ShoppingCart } from 'lucide-react';
+import Image from 'next/image';
 
 export function MobileHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,33 +19,46 @@ export function MobileHeader() {
   return (
     <header className="bg-white shadow-sm">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <Link href="/" className="text-xl font-bold text-[#6de082]">
-            Ваша Шава
+        <div className="flex flex-col items-center py-2">
+          <Link href="/" className="w-16 h-16 relative mb-2">
+            <Image
+              src="/Logo.png"
+              alt="Logo"
+              fill
+              className="object-contain"
+              priority
+            />
           </Link>
-
-          <div className="flex items-center space-x-4">
-            <Link
-              href="/cart"
-              className="relative p-2 text-gray-600 hover:text-gray-900"
+          <div className="flex items-center justify-between w-full">
+            <a
+              href="tel:+79991234567"
+              className="text-gray-600 hover:text-gray-900 font-bold"
             >
-              <ShoppingCart className="w-6 h-6" />
-              {items.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#6de082] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {items.length}
-                </span>
-              )}
-            </Link>
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 text-gray-600 hover:text-gray-900"
-            >
-              {isMenuOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
-            </button>
+              Позвонить
+            </a>
+            <div className="flex items-center space-x-4">
+              <Link
+                href="/cart"
+                className="relative p-2 text-gray-600 hover:text-gray-900"
+              >
+                <ShoppingCart className="w-6 h-6" />
+                {items.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-[#6de082] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {items.length}
+                  </span>
+                )}
+              </Link>
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="p-2 text-gray-600 hover:text-gray-900"
+              >
+                {isMenuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
