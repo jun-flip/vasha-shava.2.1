@@ -1,15 +1,18 @@
 'use client';
 
+import { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import OrderConfirmationModal from './OrderConfirmationModal';
 
 export default function Cart() {
   const { items, removeItem, updateQuantity, total } = useCart();
   const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handlePreorder = () => {
-    router.push('/preorder');
+    setIsModalOpen(true);
   };
 
   return (
@@ -77,11 +80,16 @@ export default function Cart() {
               onClick={handlePreorder}
               className="mt-4 w-full bg-[#6de082] text-white py-2 px-4 rounded-md hover:bg-[#5bc06f] transition-colors"
             >
-              Предзаказ
+              Заказать
             </button>
           </div>
         </>
       )}
+      <OrderConfirmationModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        total={total}
+      />
     </div>
   );
 } 

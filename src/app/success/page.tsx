@@ -1,36 +1,50 @@
-import Link from 'next/link';
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 
 export default function Success() {
+  const router = useRouter();
+
   return (
-    <main className="min-h-screen p-8">
-      <div className="max-w-2xl mx-auto text-center">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-green-600 mb-4">
-            Заказ успешно оформлен!
-          </h1>
-          <p className="text-gray-600">
-            Спасибо за ваш заказ. Мы свяжемся с вами в ближайшее время для подтверждения.
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          <p className="text-gray-700">
-            Номер вашего заказа: #{Math.floor(Math.random() * 10000)}
-          </p>
-          <p className="text-gray-700">
-            Примерное время доставки: 30-45 минут
-          </p>
-        </div>
-
-        <div className="mt-12">
-          <Link
-            href="/"
-            className="inline-block bg-[#6de082] text-white px-8 py-3 rounded-lg hover:bg-[#5bc06f] transition-colors"
+    <main className="min-h-screen flex items-center justify-center p-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="text-center"
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+          className="w-16 h-16 bg-[#6de082] rounded-full flex items-center justify-center mx-auto mb-6"
+        >
+          <svg
+            className="w-8 h-8 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            Вернуться на главную
-          </Link>
-        </div>
-      </div>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </motion.div>
+        <h1 className="text-3xl font-bold mb-4 text-white">Заказ успешно оформлен!</h1>
+        <p className="text-lg mb-8 text-white">
+          Мы свяжемся с вами в ближайшее время для подтверждения заказа.
+        </p>
+        <button
+          onClick={() => router.push('/')}
+          className="bg-[#6de082] text-white px-6 py-3 rounded-lg hover:bg-[#5bc06f] transition-colors"
+        >
+          Вернуться на главную
+        </button>
+      </motion.div>
     </main>
   );
 } 

@@ -6,43 +6,43 @@ import { useCart } from '../context/CartContext';
 
 export default function Checkout() {
   const router = useRouter();
-  const { clearCart } = useCart();
+  const { clearCart, items, total } = useCart();
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
-    address: '',
+    time: '',
     comment: ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Здесь будет логика отправки заказа на сервер
     try {
-      const response = await fetch('/api/order', {
+      // Отправляем заказ в Telegram
+      const telegramResponse = await fetch('/api/telegram', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          items,
+          total
+        }),
       });
 
-      const result = await response.json();
+      const telegramResult = await telegramResponse.json();
 
-      if (result.success) {
-        console.log('Заказ успешно отправлен:', result);
-        // После успешной отправки перенаправить на страницу успеха
-        clearCart();
-        router.push('/success');
-      } else {
-        console.error('Ошибка при отправке заказа:', result.message);
-        // Обработка ошибки, например, вывод сообщения пользователю
-        alert('Произошла ошибка при оформлении заказа. Попробуйте еще раз.');
+      if (!telegramResult.success) {
+        throw new Error('Failed to send order to Telegram');
       }
+
+      // Очищаем корзину и перенаправляем на страницу успеха
+      clearCart();
+      router.push('/success');
     } catch (error) {
-      console.error('Ошибка при отправке запроса:', error);
-      // Обработка ошибки сети или другой непредвиденной ошибки
-      alert('Произошла ошибка сети. Проверьте ваше соединение.');
+      console.error('Ошибка при отправке заказа:', error);
+      alert('Произошла ошибка при оформлении заказа. Попробуйте еще раз.');
     }
   };
 
@@ -55,26 +55,24 @@ export default function Checkout() {
   };
 
   const handleClose = () => {
-    router.back(); // Возвращаемся на предыдущую страницу
+    router.push('/menu');
   };
 
   return (
     <main className="min-h-screen p-8">
       <div className="max-w-2xl mx-auto relative">
-        {/* Кнопка закрытия */}
         <button
           onClick={handleClose}
-          className="absolute top-0 right-0 text-gray-500 hover:text-gray-700 text-2xl font-bold leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
-          aria-label="Закрыть"
+          className="absolute top-0 right-0 bg-[#6de082] text-white px-4 py-2 rounded-lg hover:bg-[#5bc06f] transition-colors"
         >
-          ✕
+          В меню
         </button>
 
-        <h1 className="text-3xl font-bold mb-8 text-gray-800">Оформление заказа</h1>
+        <h1 className="text-3xl font-bold mb-8 text-white">Оформление заказа</h1>
         
         <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow-md">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="name" className="block text-sm font-medium text-gray-900 mb-1">
               Ваше имя
             </label>
             <input
@@ -84,12 +82,12 @@ export default function Checkout() {
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6de082] focus:border-[#6de082] outline-none"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6de082] focus:border-[#6de082] outline-none text-gray-900"
             />
           </div>
 
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-900 mb-1">
               Телефон
             </label>
             <input
@@ -99,27 +97,29 @@ export default function Checkout() {
               value={formData.phone}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6de082] focus:border-[#6de082] outline-none"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6de082] focus:border-[#6de082] outline-none text-gray-900"
             />
           </div>
 
           <div>
-            <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-              Адрес доставки
+            <label htmlFor="time" className="block text-sm font-medium text-gray-900 mb-1">
+              К какому времени приготовить
             </label>
             <input
-              type="text"
-              id="address"
-              name="address"
-              value={formData.address}
+              type="time"
+              id="time"
+              name="time"
+              value={formData.time}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6de082] focus:border-[#6de082] outline-none"
+              min="09:00"
+              max="21:00"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6de082] focus:border-[#6de082] outline-none text-gray-900"
             />
           </div>
 
           <div>
-            <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="comment" className="block text-sm font-medium text-gray-900 mb-1">
               Комментарий к заказу (необязательно)
             </label>
             <textarea
@@ -128,7 +128,7 @@ export default function Checkout() {
               value={formData.comment}
               onChange={handleChange}
               rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6de082] focus:border-[#6de082] outline-none"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6de082] focus:border-[#6de082] outline-none text-gray-900"
             />
           </div>
 

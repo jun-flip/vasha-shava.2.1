@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MenuItem as MenuItemType } from '../../types';
+import { MenuItem as MenuItemType, Additive } from '../../types';
 import { useCart } from '../context/CartContext';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,7 +14,7 @@ export function MenuItem({ item }: MenuItemProps) {
   const { addItem } = useCart();
   const [isHovered, setIsHovered] = useState(false);
   const [isAdditivesOpen, setIsAdditivesOpen] = useState(false);
-  const [selectedAdditives, setSelectedAdditives] = useState<number[]>([]);
+  const [selectedAdditives, setSelectedAdditives] = useState<Additive[]>([]);
 
   // Отключаем hover эффекты при открытом попапе
   useEffect(() => {
@@ -24,34 +24,28 @@ export function MenuItem({ item }: MenuItemProps) {
   }, [isAdditivesOpen]);
 
   const handleAddToCart = () => {
-    const selectedAdditivesList = item.additives?.filter(additive => 
-      selectedAdditives.includes(additive.id)
-    ) || [];
-
-    // Создаем уникальный ID для товара в корзине, учитывая добавки
-    const additivesString = selectedAdditivesList.length > 0 
-      ? `-${selectedAdditivesList.map(a => a.id).sort().join('-')}`
-      : '';
-
+    // Добавляем товар в корзину напрямую, без задержки
     addItem({
-      id: `${item.id}${additivesString}`,
+      id: `${item.id}${selectedAdditives.length > 0 ? '-' + selectedAdditives.map(a => a.id).sort().join('-') : ''}`,
       name: item.name,
       price: item.price,
       image: item.image,
-      selectedAdditives: selectedAdditivesList
+      selectedAdditives: selectedAdditives
     });
+
+    // Очищаем выбранные добавки после добавления в корзину
+    setSelectedAdditives([]);
   };
 
-  const toggleAdditive = (additiveId: number) => {
+  const toggleAdditive = (additive: Additive) => {
     setSelectedAdditives(prev => 
-      prev.includes(additiveId)
-        ? prev.filter(id => id !== additiveId)
-        : [...prev, additiveId]
+      prev.find(a => a.id === additive.id)
+        ? prev.filter(a => a.id !== additive.id)
+        : [...prev, additive]
     );
   };
 
-  const totalPrice = item.price + (item.additives?.reduce((sum, additive) => 
-    selectedAdditives.includes(additive.id) ? sum + additive.price : sum, 0) || 0);
+  const totalPrice = item.price + selectedAdditives.reduce((sum, additive) => sum + additive.price, 0);
 
   return (
     <div 
@@ -78,6 +72,13 @@ export function MenuItem({ item }: MenuItemProps) {
         <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
         <p className="mt-1 text-sm text-gray-500">{item.description}</p>
         
+        {/* Отображение выбранных добавок */}
+        {!isAdditivesOpen && selectedAdditives.length > 0 && (
+          <p className="mt-2 text-sm text-gray-700">
+            Добавки: {selectedAdditives.map(add => add.name).join(', ')}
+          </p>
+        )}
+
         {item.category !== 'drinks' && item.additives && (
           <div className="mt-4">
             <button
@@ -153,8 +154,8 @@ export function MenuItem({ item }: MenuItemProps) {
                     <div className="flex items-center">
                       <input
                         type="checkbox"
-                        checked={selectedAdditives.includes(additive.id)}
-                        onChange={() => toggleAdditive(additive.id)}
+                        checked={selectedAdditives.find(a => a.id === additive.id) ? true : false}
+                        onChange={() => toggleAdditive(additive)}
                         className="w-4 h-4 text-[#6de082] border-gray-300 rounded focus:ring-[#6de082]"
                       />
                       <span className="ml-3 text-gray-700">{additive.name}</span>

@@ -7,7 +7,7 @@ import { CartProvider } from "./context/CartContext";
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
 export const metadata: Metadata = {
-  title: "Ваша Шава - Вкусная шаурма с доставкой",
+  title: "Ваша Шава",
   description: "Закажите вкусную шаурму с доставкой",
 };
 
