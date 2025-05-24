@@ -23,7 +23,7 @@ export default function Home() {
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col items-center text-center">
-              <div className="w-48 h-48 relative mb-8">
+              <div className="w-96 h-96 relative mb-8">
                 <Image
                   src="/Logo.png"
                   alt="Logo"
@@ -33,7 +33,8 @@ export default function Home() {
                 />
               </div>
               <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-8">
-                Ваша Шава
+                Вкусно! Сочно! <br />
+                Прямо в сердце точно!
               </h1>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <motion.a
@@ -145,17 +146,17 @@ export default function Home() {
           <div className="max-w-4xl mx-auto px-4">
             <h2 className="text-3xl font-bold text-white mb-8 text-center">Контакты</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <a href="tel:+79991234567" className="bg-white/10 p-6 rounded-2xl block group hover:bg-[#6de082]/10 transition-colors">
+              <a href="tel:+79991234567" className="bg-gray-900 p-6 rounded-2xl block group hover:bg-[#6de082]/10 transition-colors text-center">
                 <div className="text-[#6de082] text-3xl mb-4">📞</div>
                 <h3 className="text-white font-bold mb-2">Телефон</h3>
                 <div className="text-gray-300 group-hover:text-[#6de082] underline transition-colors">+7 (999) 123-45-67</div>
               </a>
-              <a href="https://yandex.ru/maps/org/vashashava/128821319174/?ll=52.676651%2C58.137575&z=16" target="_blank" rel="noopener noreferrer" className="bg-white/10 p-6 rounded-2xl block group hover:bg-[#6de082]/10 transition-colors">
+              <a href="https://yandex.ru/maps/org/vashashava/128821319174/?ll=52.676651%2C58.137575&z=16" target="_blank" rel="noopener noreferrer" className="bg-gray-900 p-6 rounded-2xl block group hover:bg-[#6de082]/10 transition-colors text-center">
                 <div className="text-[#6de082] text-3xl mb-4">📍</div>
                 <h3 className="text-white font-bold mb-2">Адрес</h3>
                 <div className="text-gray-300 group-hover:text-[#6de082] underline transition-colors">Сибирская ул., 6, Глазов</div>
               </a>
-              <div className="bg-white/10 p-6 rounded-2xl">
+              <div className="bg-gray-900 p-6 rounded-2xl text-center">
                 <div className="text-[#6de082] text-3xl mb-4">⏰</div>
                 <h3 className="text-white font-bold mb-2">Время работы</h3>
                 <p className="text-gray-300">10:00 - 22:00</p>
