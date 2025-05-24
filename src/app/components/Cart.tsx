@@ -239,7 +239,7 @@ export function Cart({ isOpen, onClose }: CartProps) {
                             <div className="flex items-center gap-3">
                 <button
                                 onClick={() => updateQuantity(item.id, item.quantity - 1, item.selectedAdditives)}
-                                className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300 transition-colors"
+                                className="w-8 h-8 flex items-center justify-center bg-gray-300 rounded-full hover:bg-gray-400 transition-colors text-gray-700"
                 >
                   -
                 </button>
@@ -248,7 +248,7 @@ export function Cart({ isOpen, onClose }: CartProps) {
                               </span>
                 <button
                                 onClick={() => updateQuantity(item.id, item.quantity + 1, item.selectedAdditives)}
-                                className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300 transition-colors"
+                                className="w-8 h-8 flex items-center justify-center bg-gray-300 rounded-full hover:bg-gray-400 transition-colors text-gray-700"
                 >
                   +
                 </button>
@@ -391,12 +391,12 @@ export function Cart({ isOpen, onClose }: CartProps) {
                 <div className="flex items-center gap-4 mt-6 mb-4">
                   <button
                     onClick={() => setEditQuantity(q => Math.max(1, q - 1))}
-                    className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300 text-xl"
+                    className="w-8 h-8 flex items-center justify-center bg-gray-300 rounded-full hover:bg-gray-400 transition-colors text-gray-700 text-xl"
                   >-</button>
                   <span className="text-lg font-bold w-8 text-center text-black">{editQuantity}</span>
                   <button
                     onClick={() => setEditQuantity(q => q + 1)}
-                    className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300 text-xl"
+                    className="w-8 h-8 flex items-center justify-center bg-gray-300 rounded-full hover:bg-gray-400 transition-colors text-gray-700 text-xl"
                   >+</button>
                 </div>
                 <motion.button
