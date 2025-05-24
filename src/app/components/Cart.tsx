@@ -190,25 +190,14 @@ export function Cart({ isOpen, onClose }: CartProps) {
       ) : (
                   <>
                     <div className="space-y-4 mb-6">
-                      {shawarmaWithoutAdditives.length > 0 && (
-                        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-xl mb-2 text-sm text-yellow-900 flex items-center gap-4">
-                          <span>Добавьте сыр, овощи или фирменный соус — будет ещё вкуснее!</span>
-                          <button
-                            onClick={() => handleEdit(shawarmaWithoutAdditives[0])}
-                            className="px-3 py-1 bg-[#6de082] !text-white rounded-full font-bold text-xs hover:bg-[#5bc070] transition-colors"
-                          >
-                            К добавкам
-                          </button>
-                        </div>
-                      )}
                       {items.map(item => (
                         <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+                          key={item.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
                           className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl"
-            >
+                        >
                           <div className="relative h-20 w-20 flex-shrink-0">
                             <Image
                               src={item.image}
@@ -220,7 +209,7 @@ export function Cart({ isOpen, onClose }: CartProps) {
                           <div className="flex-grow">
                             <h3 className="font-semibold text-gray-900">{item.name}</h3>
                             <p className="text-[#6de082] font-bold">{item.price} ₽</p>
-                            {item.selectedAdditives && item.selectedAdditives.length > 0 && (
+                            {item.selectedAdditives && item.selectedAdditives.length > 0 ? (
                               <div className="text-xs text-gray-500 mt-1 flex flex-wrap gap-2">
                                 {item.selectedAdditives.map((add: Additive) => (
                                   <span key={add.id} className="flex items-center gap-1 bg-gray-200 rounded px-2 py-0.5">
@@ -228,6 +217,21 @@ export function Cart({ isOpen, onClose }: CartProps) {
                                     <span>{add.name}</span>
                                   </span>
                                 ))}
+                              </div>
+                            ) : shawarmaIds.includes(item.id) && (
+                              <div className="relative group">
+                                <button
+                                  onClick={() => handleEdit(item)}
+                                  className="text-xs mt-1 px-3 py-1 bg-[#6de082] text-white rounded-full font-bold hover:bg-[#5bc070] transition-colors"
+                                >
+                                  К добавкам
+                                </button>
+                                <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block">
+                                  <div className="bg-gray-900 text-white text-xs rounded-lg p-2 w-48">
+                                    Добавьте сыр, овощи или фирменный соус — будет ещё вкуснее!
+                                    <div className="absolute bottom-0 left-4 transform translate-y-1/2 rotate-45 w-2 h-2 bg-gray-900"></div>
+                                  </div>
+                                </div>
                               </div>
                             )}
                           </div>
@@ -295,7 +299,7 @@ export function Cart({ isOpen, onClose }: CartProps) {
                           value={name}
                           onChange={e => setName(e.target.value)}
                           required
-                          className={`w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-[#6de082] focus:border-transparent outline-none transition-all ${errors.name ? 'border-red-400' : 'border-gray-300'}`}
+                          className={`w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-[#6de082] focus:border-transparent outline-none transition-all ${errors.name ? 'border-red-400' : 'border-gray-300'} text-black`}
                           placeholder="Иван"
                         />
                         {errors.name && <div className="text-xs text-red-500 mt-1">{errors.name}</div>}
@@ -309,7 +313,7 @@ export function Cart({ isOpen, onClose }: CartProps) {
                           value={phone}
                           onChange={e => setPhone(e.target.value)}
                           required
-                          className={`w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-[#6de082] focus:border-transparent outline-none transition-all ${errors.phone ? 'border-red-400' : 'border-gray-300'}`}
+                          className={`w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-[#6de082] focus:border-transparent outline-none transition-all ${errors.phone ? 'border-red-400' : 'border-gray-300'} text-black`}
                           placeholder="+7 (999) 123-45-67"
                         />
                         {errors.phone && <div className="text-xs text-red-500 mt-1">{errors.phone}</div>}
@@ -323,7 +327,7 @@ export function Cart({ isOpen, onClose }: CartProps) {
                           value={address}
                           onChange={e => setAddress(e.target.value)}
                           required
-                          className={`w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-[#6de082] focus:border-transparent outline-none transition-all ${errors.address ? 'border-red-400' : 'border-gray-300'}`}
+                          className={`w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-[#6de082] focus:border-transparent outline-none transition-all ${errors.address ? 'border-red-400' : 'border-gray-300'} text-black`}
                           placeholder="ул. Примерная, д. 1, кв. 1"
                         />
                         {errors.address && <div className="text-xs text-red-500 mt-1">{errors.address}</div>}
