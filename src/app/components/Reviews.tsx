@@ -80,7 +80,7 @@ export function Reviews() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="bg-black p-4 rounded-lg"
+            className="bg-[#5f2dab] p-4 rounded-lg"
           >
             <h3 className="text-xl font-bold text-[#6de082]">{review.author}</h3>
             <p className="text-gray-300">{review.text}</p>

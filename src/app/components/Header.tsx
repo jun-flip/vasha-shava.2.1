@@ -17,10 +17,10 @@ export function Header() {
   ];
 
   return (
-    <header className="bg-black shadow-lg border-b-2 border-[#6de082]">
+    <header className="bg-[#5f2dab] shadow-lg border-b-2 border-[#6de082]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="text-2xl font-extrabold text-white graffiti-title">
+          <Link href="/" className="text-2xl font-extrabold text-[#6de082] graffiti-title">
             Ваша Шава
           </Link>
           <nav className="hidden md:flex space-x-8">
@@ -41,7 +41,7 @@ export function Header() {
             >
               <ShoppingCart className="w-6 h-6" />
               {items.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#6de082] text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                <span className="absolute -top-1 -right-1 bg-[#6de082] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
                   {items.length}
                 </span>
               )}
@@ -72,7 +72,7 @@ export function Header() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
-          className="md:hidden bg-black border-t-2 border-[#6de082]"
+          className="md:hidden bg-[#5f2dab] border-t-2 border-[#6de082]"
         >
           <div className="px-2 pt-2 pb-3 space-y-1">
             {menuItems.map((item) => (

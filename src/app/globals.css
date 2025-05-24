@@ -3,12 +3,68 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-rgb: 102, 59, 184; /* #663bb8 */
+  --primary: #6de082;
+  --primary-dark: #5bc070;
+  --violet: #7c4dff;
+  --violet-dark: #5f2dab;
+  --background: var(--violet-dark);
+  --text: #ffffff;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-rgb));
+html, body {
+  font-family: 'Inter', 'system-ui', 'Arial', 'Helvetica Neue', sans-serif;
+  color: var(--text);
+  background: linear-gradient(135deg, var(--violet-dark) 0%, #7c4dff 100%);
   min-height: 100vh;
+}
+
+.popup-content, .popup-content * {
+  font-family: 'Inter', 'system-ui', 'Arial', 'Helvetica Neue', sans-serif !important;
+  /* color: #23213a; */
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--violet-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection Color */
+::selection {
+  background: var(--primary);
+  color: black;
+}
+
+/* Focus Outline */
+*:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Button Tap Highlight on Mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
 }

@@ -68,7 +68,7 @@ export function OrderForm({ onClose }: OrderFormProps) {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full p-2 bg-black text-white border-2 border-[#6de082] rounded-lg focus:outline-none focus:border-[#6de082]"
+            className="w-full p-2 bg-[#5f2dab] text-white border-2 border-[#6de082] rounded-lg focus:outline-none focus:border-[#6de082]"
             required
           />
         </div>
@@ -82,7 +82,7 @@ export function OrderForm({ onClose }: OrderFormProps) {
             name="address"
             value={formData.address}
             onChange={handleChange}
-            className="w-full p-2 bg-black text-white border-2 border-[#6de082] rounded-lg focus:outline-none focus:border-[#6de082]"
+            className="w-full p-2 bg-[#5f2dab] text-white border-2 border-[#6de082] rounded-lg focus:outline-none focus:border-[#6de082]"
             required
           />
         </div>
@@ -96,13 +96,13 @@ export function OrderForm({ onClose }: OrderFormProps) {
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            className="w-full p-2 bg-black text-white border-2 border-[#6de082] rounded-lg focus:outline-none focus:border-[#6de082]"
+            className="w-full p-2 bg-[#5f2dab] text-white border-2 border-[#6de082] rounded-lg focus:outline-none focus:border-[#6de082]"
             required
           />
         </div>
         <button
           type="submit"
-          className="w-full bg-[#6de082] text-black font-extrabold py-3 rounded-lg hover:bg-black hover:text-[#6de082] transition-colors duration-200"
+          className="w-full bg-[#6de082] text-white font-extrabold py-3 rounded-lg hover:bg-black hover:text-[#6de082] transition-colors duration-200"
         >
           Заказать
         </button>

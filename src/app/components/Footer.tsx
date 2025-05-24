@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 
 export function Footer() {
   return (
-    <footer className="bg-black text-white py-8 border-t-2 border-[#6de082]">
+    <footer className="bg-gradient-to-t from-[#5f2dab] to-[#7c4dff] text-white py-8 border-t-2 border-[#6de082]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>

@@ -7,22 +7,26 @@ export interface Additive {
 }
 
 export interface MenuItem {
-  id: string;
+  id: number;
   name: string;
   description: string;
   price: number;
   image: string;
-  category: Category;
+  category?: Category;
   isSpicy?: boolean;
   quantity?: number;
   additives?: Additive[];
 }
 
-export interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-  quantity?: number;
+export interface CartItem extends MenuItem {
+  quantity: number;
   selectedAdditives?: Additive[];
+}
+
+export interface OrderFormData {
+  name: string;
+  phone: string;
+  address: string;
+  items: CartItem[];
+  totalAmount: number;
 } 

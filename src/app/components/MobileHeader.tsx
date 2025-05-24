@@ -19,7 +19,7 @@ export function MobileHeader() {
     <header className="bg-white shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="text-xl font-bold text-gray-900">
+          <Link href="/" className="text-xl font-bold text-[#6de082]">
             Ваша Шава
           </Link>
 
