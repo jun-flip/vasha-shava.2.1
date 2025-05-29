@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useCart } from "./context/CartContext";
 import { Category, MenuItem as MenuItemType } from "../types";
 import { menuItems } from "../data/menu";
-import { MenuItem } from "./components/MenuItem";
+import MenuItem from "./components/MenuItem";
 import { motion } from "framer-motion";
 import Link from 'next/link';
 import Image from 'next/image';
