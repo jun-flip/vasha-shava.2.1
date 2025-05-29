@@ -42,8 +42,8 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <main className="pt-32">
+      <div className="container mx-auto px-4">
         <div className="text-center">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
@@ -51,16 +51,16 @@ export default function Home() {
             transition={{ duration: 0.5 }}
             className="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl"
           >
-            <span className="block">Ваша шаурма</span>
-            <span className="block text-[#6de082]">без очередей</span>
+            <span className="block">Сочная шаурма</span>
+            <span className="block text-[#8fc52f]">с доставкой за 35 минут</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="mt-3 max-w-md mx-auto text-base text-gray-300 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl"
+            className="mt-3 max-w-md mx-auto text-base text-white font-semibold sm:text-lg md:mt-5 md:text-xl md:max-w-3xl bg-[#8fc52f]/20 px-6 py-3 rounded-lg"
           >
-            любовь с первого укуса
+            Свежие ингредиенты и фирменный соус в каждом ролле
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -71,7 +71,7 @@ export default function Home() {
             <div className="rounded-md shadow">
               <Link
                 href="/menu"
-                className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#6de082] hover:bg-[#5bc06f] md:py-4 md:text-lg md:px-10"
+                className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#8fc52f] hover:bg-[#7db02a] md:py-4 md:text-lg md:px-10"
               >
                 МЕНЮ
               </Link>
@@ -90,7 +90,7 @@ export default function Home() {
               <div className="flow-root bg-white rounded-lg px-6 pb-4 h-full flex flex-col">
                 <div className="-mt-6 flex-grow">
                   <div>
-                    <span className="inline-flex items-center justify-center p-3 bg-[#6de082] rounded-md shadow-lg">
+                    <span className="inline-flex items-center justify-center p-3 bg-[#8fc52f] rounded-md shadow-lg">
                       <svg
                         className="h-6 w-6 text-white"
                         xmlns="http://www.w3.org/2000/svg"
@@ -114,15 +114,15 @@ export default function Home() {
                     </span>
                   </div>
                   <h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">
-                    На Свободе
+                    На Молодой Гвардии
                   </h3>
                   <p className="mt-2 text-base text-gray-500">
-                    ул. Площадь Свободы, 6А
+                    ул. Молодой Гвардии, 27
                   </p>
                   <p className="mt-2 text-base text-gray-500">
                     09:00 - 21:00
                   </p>
-                  <p className={`mt-2 text-base font-medium ${isOpen ? 'text-[#6de082]' : 'text-red-500'}`}>
+                  <p className={`mt-2 text-base font-medium ${isOpen ? 'text-[#8fc52f]' : 'text-red-500'}`}>
                     {isOpen ? 'Открыто' : 'Закрыто'}
                   </p>
                 </div>
@@ -138,7 +138,7 @@ export default function Home() {
               <div className="flow-root bg-white rounded-lg px-6 pb-4 h-full flex flex-col">
                 <div className="-mt-6 flex-grow">
                   <div>
-                    <span className="inline-flex items-center justify-center p-3 bg-[#6de082] rounded-md shadow-lg">
+                    <span className="inline-flex items-center justify-center p-3 bg-[#8fc52f] rounded-md shadow-lg">
                       <svg
                         className="h-6 w-6 text-white"
                         xmlns="http://www.w3.org/2000/svg"
@@ -150,28 +150,22 @@ export default function Home() {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                          d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
                         />
                       </svg>
                     </span>
                   </div>
                   <h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">
-                    На Сибирской
+                    Доставка
                   </h3>
                   <p className="mt-2 text-base text-gray-500">
-                    ул. Сибирская, 6
+                    Быстрая доставка по городу
                   </p>
                   <p className="mt-2 text-base text-gray-500">
-                    09:00 - 21:00
+                    Среднее время доставки<br /><span className="text-[#8fc52f]">35 минут</span>
                   </p>
-                  <p className={`mt-2 text-base font-medium ${isOpen ? 'text-[#6de082]' : 'text-red-500'}`}>
-                    {isOpen ? 'Открыто' : 'Закрыто'}
+                  <p className="mt-2 text-base text-gray-500">
+                    Бесплатная доставка<br />от 1000₽
                   </p>
                 </div>
               </div>
@@ -186,7 +180,7 @@ export default function Home() {
               <div className="flow-root bg-white rounded-lg px-6 pb-4 h-full flex flex-col">
                 <div className="-mt-6 flex-grow">
                   <div>
-                    <span className="inline-flex items-center justify-center p-3 bg-[#6de082] rounded-md shadow-lg">
+                    <span className="inline-flex items-center justify-center p-3 bg-[#8fc52f] rounded-md shadow-lg">
                       <svg
                         className="h-6 w-6 text-white"
                         xmlns="http://www.w3.org/2000/svg"
@@ -210,7 +204,7 @@ export default function Home() {
                     Закажи за ранее
                   </p>
                   <p className="mt-2 text-base text-gray-500">
-                    Среднее время приготовления<br /><span className="text-[#6de082]">5 минут</span>
+                    Среднее время приготовления<br /><span className="text-[#8fc52f]">5 минут</span>
                   </p>
                   <div className="mt-8"></div>
                 </div>

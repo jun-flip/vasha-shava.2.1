@@ -3,21 +3,21 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import CartDropdown from './CartDropdown';
 import Image from 'next/image';
 import { useCart } from '../context/CartContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useCartDropdown } from '../context/CartDropdownContext';
+import { motion } from 'framer-motion';
 
 export default function Navigation() {
   const pathname = usePathname();
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const { items, cartUpdateSignal, totalItems } = useCart();
+  const { openCart } = useCartDropdown();
   const [animateCart, setAnimateCart] = useState(false);
 
   useEffect(() => {
     if (cartUpdateSignal > 0) {
       setAnimateCart(true);
-      const timer = setTimeout(() => setAnimateCart(false), 500); // Длительность анимации
+      const timer = setTimeout(() => setAnimateCart(false), 500);
       return () => clearTimeout(timer);
     }
   }, [cartUpdateSignal]);
@@ -28,26 +28,26 @@ export default function Navigation() {
   };
 
   return (
-    <nav className="bg-[#663bb8] shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#272727] shadow-md">
+      <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between h-16">
           <div className="flex">
             <Link href="/" className="flex items-center py-2">
-              <div className="relative w-12 h-12 mr-2">
+              <div className="relative w-16 h-16 mr-2">
                 <Image
                   src="/Logo.png"
-                  alt="Ваша Шава логотип"
+                  alt="ЛАВАШ логотип"
                   fill
                   className="object-contain"
                 />
               </div>
-              <span className="text-xl font-bold text-white">Ваша Шава</span>
+              <span className="text-2xl font-extrabold text-white font-montserrat tracking-wider">ЛАВАШ</span>
             </Link>
           </div>
 
           <div className="flex items-center">
             <motion.button
-              onClick={() => setIsCartOpen(true)}
+              onClick={openCart}
               className="relative p-2 text-white hover:text-gray-200 transition-colors"
               variants={cartVariants}
               animate={animateCart ? "animate" : "initial"}
@@ -71,10 +71,9 @@ export default function Navigation() {
                 </span>
               )}
             </motion.button>
-            <CartDropdown isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
           </div>
         </div>
       </div>
-    </nav>
+    </header>
   );
 } 

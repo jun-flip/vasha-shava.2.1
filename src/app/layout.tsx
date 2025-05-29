@@ -1,14 +1,22 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
-import Navigation from "./components/Navigation";
 import { CartProvider } from "./context/CartContext";
+import Navigation from "./components/Navigation";
+import { NotificationProvider } from "./context/NotificationContext";
+import { CartDropdownProvider } from './context/CartDropdownContext';
+import CartDropdownWrapper from './components/CartDropdownWrapper';
 
-const inter = Inter({ subsets: ["latin", "cyrillic"] });
+const inter = Inter({ subsets: ["latin"] });
+const montserrat = Montserrat({ 
+  subsets: ["latin"],
+  weight: ['800'],
+  variable: '--font-montserrat',
+});
 
 export const metadata: Metadata = {
   title: "Ваша Шава",
-  description: "Закажите вкусную шаурму с доставкой",
+  description: "Заказ шавермы онлайн",
 };
 
 export default function RootLayout({
@@ -18,10 +26,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
-      <body className={inter.className}>
+      <head>
+        <link rel="icon" href="/lavash.ico" sizes="any" />
+      </head>
+      <body className={`${inter.className} ${montserrat.variable}`}>
         <CartProvider>
-          <Navigation />
-          {children}
+          <NotificationProvider>
+            <CartDropdownProvider>
+              <Navigation />
+              {children}
+              <CartDropdownWrapper />
+            </CartDropdownProvider>
+          </NotificationProvider>
         </CartProvider>
       </body>
     </html>

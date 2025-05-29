@@ -18,7 +18,7 @@ export default function Success() {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-          className="w-16 h-16 bg-[#6de082] rounded-full flex items-center justify-center mx-auto mb-6"
+          className="w-16 h-16 bg-[#8ec42e] rounded-full flex items-center justify-center mx-auto mb-6"
         >
           <svg
             className="w-8 h-8 text-white"
@@ -40,7 +40,7 @@ export default function Success() {
         </p>
         <button
           onClick={() => router.push('/')}
-          className="bg-[#6de082] text-white px-6 py-3 rounded-lg hover:bg-[#5bc06f] transition-colors"
+          className="bg-[#8ec42e] text-white px-6 py-3 rounded-lg hover:bg-[#7db02a] transition-colors"
         >
           Вернуться на главную
         </button>

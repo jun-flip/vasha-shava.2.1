@@ -36,7 +36,7 @@ export default function OrderConfirmationModal({ isOpen, onClose, total }: Order
               duration: 0.3,
               bounce: 0.2
             }}
-            className="bg-white rounded-lg p-6 max-w-md w-full mx-4"
+            className="bg-white rounded-lg p-4 sm:p-6 max-w-[280px] sm:max-w-md md:max-w-lg w-full mx-4"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">

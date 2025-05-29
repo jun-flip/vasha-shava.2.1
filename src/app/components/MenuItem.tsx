@@ -1,59 +1,65 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { MenuItem as MenuItemType, Additive } from '../../types';
-import { useCart } from '../context/CartContext';
+import { useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import { MenuItem as MenuItemType, CartItem, Additive } from '../../types';
+import { useCart } from '../context/CartContext';
+import { useNotification } from '../context/NotificationContext';
 
 interface MenuItemProps {
   item: MenuItemType;
 }
 
-export function MenuItem({ item }: MenuItemProps) {
-  const { addItem } = useCart();
-  const [isHovered, setIsHovered] = useState(false);
-  const [isAdditivesOpen, setIsAdditivesOpen] = useState(false);
+export default function MenuItem({ item }: MenuItemProps) {
+  const [isAdding, setIsAdding] = useState(false);
   const [selectedAdditives, setSelectedAdditives] = useState<Additive[]>([]);
-
-  // Отключаем hover эффекты при открытом попапе
-  useEffect(() => {
-    if (isAdditivesOpen) {
-      setIsHovered(false);
-    }
-  }, [isAdditivesOpen]);
+  const [isAdditivesOpen, setIsAdditivesOpen] = useState(false);
+  const { addItem } = useCart();
+  const { showNotification } = useNotification();
 
   const handleAddToCart = () => {
-    // Добавляем товар в корзину напрямую, без задержки
-    addItem({
-      id: `${item.id}${selectedAdditives.length > 0 ? '-' + selectedAdditives.map(a => a.id).sort().join('-') : ''}`,
+    setIsAdding(true);
+    const cartItem: CartItem = {
+      id: `${item.id}-${Date.now()}`,
       name: item.name,
       price: item.price,
       image: item.image,
+      quantity: 1,
       selectedAdditives: selectedAdditives
-    });
-
-    // Очищаем выбранные добавки после добавления в корзину
+    };
+    addItem(cartItem);
+    showNotification(cartItem);
     setSelectedAdditives([]);
+    
+    // Воспроизводим звук
+    const audio = new Audio('/sounds/bubbles4.mp3');
+    audio.play().catch(error => console.log('Ошибка воспроизведения звука:', error));
+    setTimeout(() => setIsAdding(false), 500);
   };
 
   const toggleAdditive = (additive: Additive) => {
-    setSelectedAdditives(prev => 
-      prev.find(a => a.id === additive.id)
-        ? prev.filter(a => a.id !== additive.id)
-        : [...prev, additive]
-    );
+    setSelectedAdditives(prev => {
+      const isSelected = prev.some(a => a.id === additive.id);
+      if (isSelected) {
+        return prev.filter(a => a.id !== additive.id);
+      } else {
+        return [...prev, additive];
+      }
+    });
   };
 
-  const totalPrice = item.price + selectedAdditives.reduce((sum, additive) => sum + additive.price, 0);
+  const calculateTotalPrice = () => {
+    const additivesPrice = selectedAdditives.reduce((sum, additive) => sum + additive.price, 0);
+    return item.price + additivesPrice;
+  };
 
   return (
-    <div 
-      className={`bg-white rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.1)] overflow-hidden transition-all duration-300 ${
-        !isAdditivesOpen && 'hover:scale-105 hover:shadow-[0_8px_30px_rgba(0,0,0,0.15)]'
-      }`}
-      onMouseEnter={() => !isAdditivesOpen && setIsHovered(true)}
-      onMouseLeave={() => !isAdditivesOpen && setIsHovered(false)}
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-lg shadow-md overflow-hidden"
     >
       <div className="relative h-48">
         <Image
@@ -68,116 +74,108 @@ export function MenuItem({ item }: MenuItemProps) {
           </div>
         )}
       </div>
-      <div className="p-4">
+        <div className="p-4 flex flex-col h-[220px]">
+          <div className="flex-1">
         <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
-        <p className="mt-1 text-sm text-gray-500">{item.description}</p>
-        
-        {/* Отображение выбранных добавок */}
-        {!isAdditivesOpen && selectedAdditives.length > 0 && (
-          <p className="mt-2 text-sm text-gray-700">
-            Добавки: {selectedAdditives.map(add => add.name).join(', ')}
-          </p>
-        )}
-
-        {item.category !== 'drinks' && item.additives && (
-          <div className="mt-4">
+            <p className="text-gray-600 text-sm mt-1 line-clamp-2">{item.description}</p>
+            <div className="mt-2">
+              <p className="text-[#8fc52f] font-semibold">{item.price} ₽</p>
+            </div>
+          </div>
+          <div className="mt-auto">
+            {item.additives && item.additives.length > 0 && (
             <button
               onClick={() => setIsAdditivesOpen(true)}
-              className="w-full flex items-center justify-between text-sm font-medium text-gray-700 hover:text-gray-900 shadow-sm hover:shadow-md transition-shadow duration-300 p-2 rounded-lg"
+                className="w-full py-2 rounded-lg bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors"
             >
-              <span>Добавки</span>
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
+                Добавки
             </button>
-          </div>
         )}
-
-        <div className="mt-4 flex items-center justify-between">
-          <span className="text-lg font-bold text-[#6de082]">{totalPrice} ₽</span>
-          <button
+            <motion.button
+              whileTap={{ scale: 0.95 }}
             onClick={handleAddToCart}
-            className={`px-4 py-2 rounded-md text-white font-medium transition-all duration-300 shadow-md hover:shadow-lg ${
-              isHovered && !isAdditivesOpen ? 'bg-[#5bc06f]' : 'bg-[#6de082]'
+              disabled={isAdding}
+              className={`mt-3 w-full py-2 rounded-lg transition-colors ${
+                isAdding
+                  ? 'bg-gray-300 cursor-not-allowed'
+                  : 'bg-[#8fc52f] hover:bg-[#7db02a] text-white'
             }`}
           >
-            В корзину
-          </button>
+              {isAdding ? 'Добавлено' : 'В корзину'}
+            </motion.button>
+          </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Additives Popup */}
-      <AnimatePresence mode="wait">
+      {/* Попап с добавками */}
+      <AnimatePresence>
         {isAdditivesOpen && (
+          <>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]"
+              className="fixed inset-0 bg-black bg-opacity-50 z-50"
             onClick={() => setIsAdditivesOpen(false)}
-          >
+            />
             <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              transition={{ 
-                type: "spring",
-                duration: 0.3,
-                bounce: 0.2
-              }}
-              className="bg-white rounded-lg p-6 max-w-md w-full mx-4"
-              onClick={e => e.stopPropagation()}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="fixed top-[64px] left-[calc(50%-140px)] sm:left-[calc(50%-175px)] md:left-[calc(50%-250px)] w-[280px] sm:w-[350px] md:w-[500px] h-[80vh] bg-white rounded-lg shadow-xl z-50 flex flex-col"
             >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold text-gray-900">Добавки</h3>
+              <div className="flex justify-between items-center p-4 border-b">
+                <h3 className="text-lg font-semibold text-gray-900">Добавки</h3>
                 <button
                   onClick={() => setIsAdditivesOpen(false)}
                   className="text-gray-500 hover:text-gray-700"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  ✕
                 </button>
               </div>
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {item.additives?.map((additive) => (
-                  <label
+              <div className="flex-1 overflow-y-auto p-4">
+                <div className="space-y-3">
+                  {item.additives?.map(additive => (
+                    <button
                     key={additive.id}
-                    className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 cursor-pointer"
-                  >
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={selectedAdditives.find(a => a.id === additive.id) ? true : false}
-                        onChange={() => toggleAdditive(additive)}
-                        className="w-4 h-4 text-[#6de082] border-gray-300 rounded focus:ring-[#6de082]"
-                      />
-                      <span className="ml-3 text-gray-700">{additive.name}</span>
+                      onClick={() => toggleAdditive(additive)}
+                      className={`w-full px-4 py-2 rounded-lg text-left transition-colors ${
+                        selectedAdditives.some(a => a.id === additive.id)
+                          ? 'bg-[#8fc52f] text-white'
+                          : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                      }`}
+                    >
+                      <div className="flex justify-between items-center">
+                        <span>{additive.name}</span>
+                        <span>+{additive.price} ₽</span>
                     </div>
-                    <span className="text-gray-600">+{additive.price} ₽</span>
-                  </label>
+                    </button>
                 ))}
+                </div>
               </div>
-              <div className="mt-6 flex justify-between items-center">
-                <span className="text-lg font-semibold text-gray-900">Итого с добавками:</span>
-                <span className="text-xl font-bold text-[#6de082]">{totalPrice} ₽</span>
+              <div className="p-4 border-t bg-white">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-gray-900 font-medium">Итого:</span>
+                  <span className="text-gray-900 font-medium">{calculateTotalPrice()} ₽</span>
+                </div>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    handleAddToCart();
+                    setIsAdditivesOpen(false);
+                    setSelectedAdditives([]);
+                  }}
+                  className="w-full bg-[#8fc52f] text-white py-2 rounded-lg hover:bg-[#7db02a] transition-colors"
+                >
+                  В корзину
+                </motion.button>
               </div>
-              <button
-                onClick={() => setIsAdditivesOpen(false)}
-                className="mt-4 w-full bg-[#6de082] text-white py-2 px-4 rounded-md hover:bg-[#5bc06f] transition-all duration-300 shadow-md hover:shadow-lg"
-              >
-                Готово
-              </button>
             </motion.div>
-          </motion.div>
+          </>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 } 
