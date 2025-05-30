@@ -6,6 +6,7 @@ import Navigation from "./components/Navigation";
 import { NotificationProvider } from "./context/NotificationContext";
 import { CartDropdownProvider } from './context/CartDropdownContext';
 import CartDropdownWrapper from './components/CartDropdownWrapper';
+import { SoundProvider } from './context/SoundContext';
 
 const inter = Inter({ subsets: ["latin"] });
 const montserrat = Montserrat({ 
@@ -33,9 +34,11 @@ export default function RootLayout({
         <CartProvider>
           <NotificationProvider>
             <CartDropdownProvider>
-              <Navigation />
-              {children}
-              <CartDropdownWrapper />
+              <SoundProvider>
+                <Navigation />
+                {children}
+                <CartDropdownWrapper />
+              </SoundProvider>
             </CartDropdownProvider>
           </NotificationProvider>
         </CartProvider>

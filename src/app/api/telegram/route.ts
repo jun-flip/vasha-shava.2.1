@@ -1,7 +1,32 @@
 import { NextResponse } from 'next/server';
+import fs from 'fs';
+import path from 'path';
 
-// Счетчик заказов
-let orderCounter = 0;
+// Путь к файлу с счетчиком
+const COUNTER_FILE = path.join(process.cwd(), 'order-counter.txt');
+
+// Функция для получения текущего значения счетчика
+function getOrderCounter(): number {
+  try {
+    if (fs.existsSync(COUNTER_FILE)) {
+      const counter = parseInt(fs.readFileSync(COUNTER_FILE, 'utf-8'));
+      return isNaN(counter) ? 0 : counter;
+    }
+    return 0;
+  } catch (error) {
+    console.error('Ошибка при чтении счетчика:', error);
+    return 0;
+  }
+}
+
+// Функция для сохранения нового значения счетчика
+function saveOrderCounter(counter: number): void {
+  try {
+    fs.writeFileSync(COUNTER_FILE, counter.toString());
+  } catch (error) {
+    console.error('Ошибка при сохранении счетчика:', error);
+  }
+}
 
 interface OrderData {
   name: string;
@@ -23,8 +48,9 @@ export async function POST(request: Request) {
   try {
     const orderData: OrderData = await request.json();
 
-    // Увеличиваем счетчик заказов
-    orderCounter++;
+    // Получаем текущее значение счетчика и увеличиваем его
+    const orderCounter = getOrderCounter() + 1;
+    saveOrderCounter(orderCounter);
 
     // Формируем ID заказа (счетчик с ведущими нулями)
     const orderId = orderCounter.toString().padStart(4, '0');

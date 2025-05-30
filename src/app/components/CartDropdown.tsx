@@ -8,12 +8,15 @@ import { useState, useEffect } from 'react';
 import { MenuItem } from '../../types';
 import { useNotification } from '../context/NotificationContext';
 import { useCartDropdown } from '../context/CartDropdownContext';
+import { useClickSound } from '../hooks/useClickSound';
+import SoundButton from './SoundButton';
 
 export default function CartDropdown() {
   const router = useRouter();
   const { items, removeItem, updateQuantity, addItem } = useCart();
   const { showNotification } = useNotification();
   const { isOpen, closeCart } = useCartDropdown();
+  const handleClick = useClickSound();
   const [recommendedDrinks, setRecommendedDrinks] = useState<MenuItem[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [showRecommendations, setShowRecommendations] = useState(true);
@@ -131,7 +134,7 @@ export default function CartDropdown() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="fixed inset-0 bg-black bg-opacity-50 z-50"
-            onClick={closeCart}
+            onClick={handleClick(closeCart)}
           />
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -142,12 +145,12 @@ export default function CartDropdown() {
           >
             <div className="flex justify-between items-center p-4 border-b">
               <h3 className="text-lg font-semibold text-gray-900">Корзина</h3>
-              <button
-                onClick={closeCart}
+              <SoundButton
+                onClick={handleClick(closeCart)}
                 className="text-gray-500 hover:text-gray-700"
               >
                 ✕
-              </button>
+              </SoundButton>
             </div>
             <div className="flex-1 overflow-y-auto p-4">
             {items.length === 0 ? (
@@ -178,39 +181,39 @@ export default function CartDropdown() {
                               <p className="text-xs text-gray-900 font-medium">К заказу отлично подойдет:</p>
                               <div className="flex flex-wrap gap-1 mt-0.5">
                                 {recommendedAdditives.map(additive => (
-                                  <button
+                                  <SoundButton
                                     key={additive.id}
                                     onClick={() => handleAddAdditive(item.id, additive)}
                                     className="bg-[#8fc52f] px-1.5 py-0.5 rounded-full text-xs text-white hover:bg-[#7db02a] transition-colors"
                                   >
                                     {additive.name} +{additive.price}₽
-                                  </button>
+                                  </SoundButton>
                                 ))}
                               </div>
                             </div>
                           )}
                           <div className="flex items-center justify-between mt-1">
                             <div className="flex items-center space-x-2">
-                          <button
+                          <SoundButton
                                 onClick={() => updateQuantity(item.id, (item.quantity || 1) - 1)}
                                 className="px-2 py-1 border rounded text-gray-700 hover:bg-[#8fc52f] hover:text-white transition-colors"
                           >
                             -
-                          </button>
+                          </SoundButton>
                               <span className="text-sm text-gray-900">{item.quantity || 1}</span>
-                          <button
+                          <SoundButton
                             onClick={() => updateQuantity(item.id, (item.quantity || 1) + 1)}
                                 className="px-2 py-1 border rounded text-gray-700 hover:bg-[#8fc52f] hover:text-white transition-colors"
                           >
                             +
-                          </button>
+                          </SoundButton>
                         </div>
-                        <button
+                        <SoundButton
                           onClick={() => removeItem(item.id)}
                           className="text-red-500 hover:text-red-700"
                         >
                           ✕
-                        </button>
+                        </SoundButton>
                       </div>
                         </div>
                         <div className="text-sm font-medium text-gray-900">
@@ -226,12 +229,12 @@ export default function CartDropdown() {
               <div className="p-4 border-t">
                 <div className="flex justify-between items-center mb-3">
                   <h4 className="text-sm font-medium text-gray-900">К заказу отлично подойдет</h4>
-                  <button
+                  <SoundButton
                     onClick={() => setShowRecommendations(false)}
                     className="text-gray-500 hover:text-gray-700"
                   >
                     ✕
-                  </button>
+                  </SoundButton>
                 </div>
                 <div className="space-y-2">
                   {recommendedDrinks.map((drink) => (
@@ -248,12 +251,12 @@ export default function CartDropdown() {
                         <h5 className="text-sm font-medium text-gray-900">{drink.name}</h5>
                         <p className="text-xs text-gray-500">{drink.price} ₽</p>
                       </div>
-                      <button
+                      <SoundButton
                         onClick={() => handleAddDrink(drink)}
                         className="px-3 py-1 bg-[#8fc52f] text-white text-sm rounded-lg hover:bg-[#7db02a] transition-colors"
                       >
                         Добавить
-                      </button>
+                      </SoundButton>
                     </div>
                   ))}
                 </div>
@@ -265,22 +268,31 @@ export default function CartDropdown() {
                 <span className="text-gray-900 font-medium">
                   {(() => {
                     const subtotal = items.reduce((total, item) => total + item.price * (item.quantity || 1), 0);
-                    const deliveryCost = subtotal < 1000 ? 200 : 0;
+                    const deliveryCost = subtotal > 0 && subtotal < 1000 ? 200 : 0;
                     return `${subtotal + deliveryCost} ₽`;
                   })()}
                 </span>
               </div>
-              {items.reduce((total, item) => total + item.price * (item.quantity || 1), 0) < 1000 && (
+              {items.length === 0 ? (
+                <div className="text-sm text-gray-500 mb-4">
+                  Ваша корзина пуста
+                </div>
+              ) : items.reduce((total, item) => total + item.price * (item.quantity || 1), 0) < 1000 && (
                 <div className="text-sm text-gray-500 mb-4">
                   * Доставка 200₽ включена в сумму
                 </div>
               )}
-              <button
+              <SoundButton
                 onClick={handleCheckout}
-                className="w-full bg-[#8fc52f] text-white py-3 rounded-lg hover:bg-[#7db02a] transition-colors"
+                disabled={items.length === 0}
+                className={`w-full py-3 rounded-lg text-white transition-colors ${
+                  items.length === 0
+                    ? 'bg-gray-300 cursor-not-allowed'
+                    : 'bg-[#8fc52f] hover:bg-[#7db02a]'
+                }`}
               >
                 Оформить заказ
-              </button>
+              </SoundButton>
             </div>
           </motion.div>
         </>

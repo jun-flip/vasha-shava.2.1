@@ -17,6 +17,8 @@ interface FormData {
   phone: string;
   address: Address;
   comment: string;
+  isPickup: boolean;
+  pickupTime: string;
 }
 
 const STORAGE_KEY = 'checkout_form_data';
@@ -35,7 +37,9 @@ export default function Checkout() {
       entrance: '',
       floor: ''
     },
-    comment: ''
+    comment: '',
+    isPickup: false,
+    pickupTime: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAddressFields, setShowAddressFields] = useState(false);
@@ -76,8 +80,10 @@ export default function Checkout() {
     try {
       setIsSubmitting(true);
 
-      // Форматируем адрес для отправки
-      const formattedAddress = `${formData.address.street}, д. ${formData.address.house}, кв. ${formData.address.apartment}, подъезд ${formData.address.entrance}, этаж ${formData.address.floor}`;
+      // Форматируем адрес или время самовывоза для отправки
+      const formattedAddress = formData.isPickup 
+        ? `Самовывоз в ${formData.pickupTime}`
+        : `${formData.address.street}, д. ${formData.address.house}, кв. ${formData.address.apartment}, подъезд ${formData.address.entrance}, этаж ${formData.address.floor}`;
 
       // Отправляем заказ в Telegram
       const telegramResponse = await fetch('/api/telegram', {
@@ -118,8 +124,14 @@ export default function Checkout() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    if (name.startsWith('address.')) {
+    const { name, value, type } = e.target;
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setFormData(prev => ({
+        ...prev,
+        [name]: checked
+      }));
+    } else if (name.startsWith('address.')) {
       const field = name.split('.')[1];
       setFormData(prev => ({
         ...prev,
@@ -183,77 +195,108 @@ export default function Checkout() {
             />
           </div>
 
-          <div>
-            <label htmlFor="address" className="block text-sm font-medium text-gray-900 mb-1">
-              Адрес доставки
+          <div className="flex items-center mb-4">
+            <input
+              type="checkbox"
+              id="isPickup"
+              name="isPickup"
+              checked={formData.isPickup}
+              onChange={handleChange}
+              className="h-4 w-4 text-[#8fc52f] focus:ring-[#8fc52f] border-gray-300 rounded"
+            />
+            <label htmlFor="isPickup" className="ml-2 block text-sm text-gray-900">
+              Заберу сам
             </label>
-            <div className="space-y-4">
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    id="address.street"
-                    name="address.street"
-                    value={formData.address.street}
-                    onChange={handleChange}
-                    placeholder="Улица"
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
-                  />
+          </div>
+
+          {formData.isPickup ? (
+            <div>
+              <label htmlFor="pickupTime" className="block text-sm font-medium text-gray-900 mb-1">
+                Время самовывоза
+              </label>
+              <input
+                type="time"
+                id="pickupTime"
+                name="pickupTime"
+                value={formData.pickupTime}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
+              />
+            </div>
+          ) : (
+            <div>
+              <label htmlFor="address" className="block text-sm font-medium text-gray-900 mb-1">
+                Адрес доставки
+              </label>
+              <div className="space-y-4">
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      id="address.street"
+                      name="address.street"
+                      value={formData.address.street}
+                      onChange={handleChange}
+                      placeholder="Улица"
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
+                    />
+                  </div>
+                  <div className="w-24">
+                    <input
+                      type="text"
+                      id="address.house"
+                      name="address.house"
+                      value={formData.address.house}
+                      onChange={handleChange}
+                      placeholder="Дом"
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
+                    />
+                  </div>
                 </div>
-                <div className="w-24">
-                  <input
-                    type="text"
-                    id="address.house"
-                    name="address.house"
-                    value={formData.address.house}
-                    onChange={handleChange}
-                    placeholder="Дом"
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="w-24">
-                  <input
-                    type="text"
-                    id="address.apartment"
-                    name="address.apartment"
-                    value={formData.address.apartment}
-                    onChange={handleChange}
-                    placeholder="Кв."
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
-                  />
-                </div>
-                <div className="w-24">
-                  <input
-                    type="text"
-                    id="address.entrance"
-                    name="address.entrance"
-                    value={formData.address.entrance}
-                    onChange={handleChange}
-                    placeholder="Подъезд"
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
-                  />
-                </div>
-                <div className="w-24">
-                  <input
-                    type="text"
-                    id="address.floor"
-                    name="address.floor"
-                    value={formData.address.floor}
-                    onChange={handleChange}
-                    placeholder="Этаж"
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
-                  />
+                <div className="flex gap-4">
+                  <div className="w-24">
+                    <input
+                      type="text"
+                      id="address.apartment"
+                      name="address.apartment"
+                      value={formData.address.apartment}
+                      onChange={handleChange}
+                      placeholder="Кв."
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
+                    />
+                  </div>
+                  <div className="w-24">
+                    <input
+                      type="text"
+                      id="address.entrance"
+                      name="address.entrance"
+                      value={formData.address.entrance}
+                      onChange={handleChange}
+                      placeholder="Подъезд"
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
+                    />
+                  </div>
+                  <div className="w-24">
+                    <input
+                      type="text"
+                      id="address.floor"
+                      name="address.floor"
+                      value={formData.address.floor}
+                      onChange={handleChange}
+                      placeholder="Этаж"
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           <div>
             <label htmlFor="comment" className="block text-sm font-medium text-gray-900 mb-1">
