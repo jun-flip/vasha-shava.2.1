@@ -3,13 +3,16 @@ import { supabase } from '@/lib/supabase';
 
 export async function POST(request: Request) {
   try {
+    console.log('Начало обработки заказа');
     const orderData = await request.json();
+    console.log('Получены данные заказа:', JSON.stringify(orderData, null, 2));
     
     // Validate required fields
     const requiredFields = ['name', 'phone', 'address'];
     const missingFields = requiredFields.filter(field => !orderData[field]);
     
     if (missingFields.length > 0) {
+      console.log('Отсутствуют обязательные поля:', missingFields);
       return NextResponse.json(
         { 
           message: `Missing required fields: ${missingFields.join(', ')}`, 
@@ -22,6 +25,7 @@ export async function POST(request: Request) {
     // Validate phone number format (basic validation)
     const phoneRegex = /^\+?[1-9]\d{10,14}$/;
     if (!phoneRegex.test(orderData.phone)) {
+      console.log('Неверный формат телефона:', orderData.phone);
       return NextResponse.json(
         { 
           message: 'Invalid phone number format', 
@@ -34,6 +38,7 @@ export async function POST(request: Request) {
     console.log('Получен новый заказ:', orderData);
 
     // Получаем текущий счетчик заказов
+    console.log('Получение счетчика заказов...');
     const { data: counter, error: counterError } = await supabase
       .from('counters')
       .select('seq')
@@ -41,19 +46,25 @@ export async function POST(request: Request) {
       .single();
 
     if (counterError && counterError.code !== 'PGRST116') {
+      console.error('Ошибка при получении счетчика:', counterError);
       throw counterError;
     }
 
     let orderNumber;
     if (!counter) {
+      console.log('Создание нового счетчика...');
       // Если счетчика нет, создаем его
       const { error: insertError } = await supabase
         .from('counters')
         .insert([{ id: 'orderCounter', seq: 1 }]);
       
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Ошибка при создании счетчика:', insertError);
+        throw insertError;
+      }
       orderNumber = '0001';
     } else {
+      console.log('Инкремент существующего счетчика...');
       // Инкрементируем счетчик
       const { data: updatedCounter, error: updateError } = await supabase
         .from('counters')
@@ -62,10 +73,14 @@ export async function POST(request: Request) {
         .select()
         .single();
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Ошибка при обновлении счетчика:', updateError);
+        throw updateError;
+      }
       orderNumber = updatedCounter.seq.toString().padStart(4, '0');
     }
 
+    console.log('Сохранение заказа в базу данных...');
     // Сохраняем заказ
     const { data: order, error: orderError } = await supabase
       .from('orders')
@@ -77,7 +92,12 @@ export async function POST(request: Request) {
       .select()
       .single();
 
-    if (orderError) throw orderError;
+    if (orderError) {
+      console.error('Ошибка при сохранении заказа:', orderError);
+      throw orderError;
+    }
+
+    console.log('Заказ успешно сохранен:', order);
 
     // Формируем сообщение для Telegram
     const message = `
@@ -96,6 +116,7 @@ ${orderData.items.map((item: any) =>
 💳 Способ оплаты: ${orderData.paymentMethod}
 `;
 
+    console.log('Отправка уведомления в Telegram...');
     // Отправляем уведомление в Telegram
     const telegramResponse = await fetch(
       `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
@@ -113,8 +134,12 @@ ${orderData.items.map((item: any) =>
     );
 
     if (!telegramResponse.ok) {
-      throw new Error('Failed to send Telegram notification');
+      const errorText = await telegramResponse.text();
+      console.error('Ошибка при отправке в Telegram:', errorText);
+      throw new Error(`Failed to send Telegram notification: ${errorText}`);
     }
+
+    console.log('Уведомление в Telegram успешно отправлено');
 
     return NextResponse.json({ 
       success: true, 
@@ -122,9 +147,12 @@ ${orderData.items.map((item: any) =>
       orderNumber: order.order_number 
     });
   } catch (error) {
-    console.error('Error creating order:', error);
+    console.error('Критическая ошибка при создании заказа:', error);
     return NextResponse.json(
-      { error: 'Failed to create order' },
+      { 
+        error: 'Failed to create order',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }
