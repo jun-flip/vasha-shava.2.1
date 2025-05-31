@@ -113,9 +113,9 @@ ${orderData.items.map((item: any) => {
   return `• ${item.name} x${item.quantity || 1} - ${itemTotal}₽${additions ? '\n' + additions : ''}`;
 }).join('\n')}
 
-🚚 Доставка - ${DELIVERY_COST}₽
-
-💰 Итого: ${totalWithDelivery}₽
+💰 Сумма заказа: ${itemsTotal}₽
+🚚 Доставка: ${DELIVERY_COST}₽
+💵 Итого к оплате: ${totalWithDelivery}₽
 `;
 
     console.log('Отправка уведомления в Telegram...');
@@ -162,7 +162,7 @@ ${orderData.items.map((item: any) => {
       { 
         error: 'Failed to create order',
         details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      }, 
       { status: 500 }
     );
   }
