@@ -124,6 +124,7 @@ export async function POST(request: Request) {
 👤 Имя: ${orderData.name}
 📞 Телефон: ${orderData.phone}
 📍 Адрес: ${orderData.address}
+${orderData.comment ? `💬 Комментарий: ${orderData.comment}` : ''}
 
 🛒 Заказ:
 ${orderData.items.map((item: any) => 
