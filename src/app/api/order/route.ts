@@ -4,6 +4,13 @@ import { supabase } from '@/lib/supabase';
 export async function POST(request: Request) {
   try {
     console.log('Начало обработки заказа');
+    console.log('Environment variables:', {
+      SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? '***' : 'missing',
+      SUPABASE_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '***' : 'missing',
+      TELEGRAM_BOT: process.env.TELEGRAM_BOT_TOKEN ? '***' : 'missing',
+      TELEGRAM_CHAT: process.env.TELEGRAM_CHAT_ID ? '***' : 'missing'
+    });
+
     const orderData = await request.json();
     console.log('Получены данные заказа:', JSON.stringify(orderData, null, 2));
     
@@ -45,9 +52,13 @@ export async function POST(request: Request) {
       .eq('id', 'orderCounter')
       .single();
 
-    if (counterError && counterError.code !== 'PGRST116') {
+    if (counterError) {
       console.error('Ошибка при получении счетчика:', counterError);
-      throw counterError;
+      if (counterError.code === 'PGRST116') {
+        console.log('Счетчик не найден, создаем новый...');
+      } else {
+        throw counterError;
+      }
     }
 
     let orderNumber;
@@ -117,6 +128,11 @@ ${orderData.items.map((item: any) =>
 `;
 
     console.log('Отправка уведомления в Telegram...');
+    if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) {
+      console.error('Отсутствуют переменные окружения для Telegram');
+      throw new Error('Missing Telegram environment variables');
+    }
+
     // Отправляем уведомление в Telegram
     const telegramResponse = await fetch(
       `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
