@@ -104,8 +104,15 @@ export async function POST(request: Request) {
 
     console.log('Сформированный номер заказа:', orderNumber);
 
+    // Рассчитываем общую сумму заказа
+    const itemsTotal = orderData.items.reduce((sum: number, item: any) => {
+      const itemTotal = item.price * (item.quantity || 1);
+      const additionsTotal = (item.additions || []).reduce((addSum: number, add: any) => addSum + (add.price || 0), 0);
+      return sum + itemTotal + additionsTotal;
+    }, 0);
+
     // Добавляем стоимость доставки к общей сумме
-    const totalWithDelivery = orderData.totalPrice + DELIVERY_COST;
+    const totalWithDelivery = itemsTotal + DELIVERY_COST;
 
     console.log('Сохранение заказа в базу данных...');
     // Сохраняем заказ
@@ -133,18 +140,20 @@ export async function POST(request: Request) {
 🆕 Новый заказ ${order.order_number}
 
 👤 Имя: ${orderData.name}
-📞 Телефон: ${orderData.phone}
+📱 Телефон: ${orderData.phone}
 📍 Адрес: ${orderData.address}
 ${orderData.comment ? `💬 Комментарий: ${orderData.comment}` : ''}
 
-🛒 Заказ:
-${orderData.items.map((item: any) => 
-  `• ${item.name} x${item.quantity || 1} - ${item.price * (item.quantity || 1)} ₽`
-).join('\n')}
+🍽 Заказ:
+${orderData.items.map((item: any) => {
+  const itemTotal = item.price * (item.quantity || 1);
+  const additions = (item.additions || []).map((add: any) => `   + ${add.name} (+${add.price}₽)`).join('\n');
+  return `• ${item.name} x${item.quantity || 1} - ${itemTotal}₽${additions ? '\n' + additions : ''}`;
+}).join('\n')}
 
-🚚 Доставка: ${DELIVERY_COST} ₽
-💰 Итого: ${totalWithDelivery} ₽
-💳 Способ оплаты: ${orderData.paymentMethod}
+🚚 Доставка - ${DELIVERY_COST}₽
+
+💰 Итого: ${totalWithDelivery}₽
 `;
 
     console.log('Отправка уведомления в Telegram...');
