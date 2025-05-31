@@ -112,9 +112,8 @@ ${orderData.items.map((item: any) => {
   const additions = (item.additions || []).map((add: any) => `   + ${add.name} (+${add.price}₽)`).join('\n');
   return `• ${item.name} x${item.quantity || 1} - ${itemTotal}₽${additions ? '\n' + additions : ''}`;
 }).join('\n')}
+• Доставка - ${DELIVERY_COST}₽
 
-💰 Сумма заказа: ${itemsTotal}₽
-🚚 Доставка: ${DELIVERY_COST}₽
 💵 Итого к оплате: ${totalWithDelivery}₽
 `;
 
