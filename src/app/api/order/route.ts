@@ -48,6 +48,7 @@ export async function POST(request: Request) {
     }
 
     console.log('Получен новый заказ:', orderData);
+    console.log('Комментарий к заказу:', orderData.comment);
 
     // Получаем текущий счетчик заказов
     console.log('Получение счетчика заказов...');
@@ -142,7 +143,7 @@ export async function POST(request: Request) {
 👤 Имя: ${orderData.name}
 📱 Телефон: ${orderData.phone}
 📍 Адрес: ${orderData.address}
-${orderData.comment ? `💬 Комментарий: ${orderData.comment}` : ''}
+${orderData.comment ? `\n💬 Комментарий к заказу:\n${orderData.comment}` : ''}
 
 🍽 Заказ:
 ${orderData.items.map((item: any) => {
@@ -157,6 +158,8 @@ ${orderData.items.map((item: any) => {
 `;
 
     console.log('Отправка уведомления в Telegram...');
+    console.log('Текст сообщения:', message);
+
     if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) {
       console.error('Отсутствуют переменные окружения для Telegram');
       throw new Error('Missing Telegram environment variables');
