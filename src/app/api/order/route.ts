@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
+const DELIVERY_COST = 200; // Стоимость доставки
+
 export async function POST(request: Request) {
   try {
     console.log('Начало обработки заказа');
@@ -91,6 +93,9 @@ export async function POST(request: Request) {
       orderNumber = updatedCounter.seq.toString().padStart(4, '0');
     }
 
+    // Добавляем стоимость доставки к общей сумме
+    const totalWithDelivery = orderData.totalPrice + DELIVERY_COST;
+
     console.log('Сохранение заказа в базу данных...');
     // Сохраняем заказ
     const { data: order, error: orderError } = await supabase
@@ -98,6 +103,8 @@ export async function POST(request: Request) {
       .insert([{
         ...orderData,
         order_number: `#${orderNumber}`,
+        total_price: totalWithDelivery,
+        delivery_cost: DELIVERY_COST,
         created_at: new Date().toISOString()
       }])
       .select()
@@ -123,7 +130,8 @@ ${orderData.items.map((item: any) =>
   `• ${item.name} x${item.quantity || 1} - ${item.price * (item.quantity || 1)} ₽`
 ).join('\n')}
 
-💰 Итого: ${orderData.totalPrice} ₽
+🚚 Доставка: ${DELIVERY_COST} ₽
+💰 Итого: ${totalWithDelivery} ₽
 💳 Способ оплаты: ${orderData.paymentMethod}
 `;
 
@@ -160,7 +168,8 @@ ${orderData.items.map((item: any) =>
     return NextResponse.json({ 
       success: true, 
       orderId: order.id,
-      orderNumber: order.order_number 
+      orderNumber: order.order_number,
+      totalWithDelivery
     });
   } catch (error) {
     console.error('Критическая ошибка при создании заказа:', error);
