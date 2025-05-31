@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabase, initializeCounters } from '@/lib/supabase';
 
 const DELIVERY_COST = 200; // Стоимость доставки
 
@@ -12,6 +12,9 @@ export async function POST(request: Request) {
       TELEGRAM_BOT: process.env.TELEGRAM_BOT_TOKEN ? '***' : 'missing',
       TELEGRAM_CHAT: process.env.TELEGRAM_CHAT_ID ? '***' : 'missing'
     });
+
+    // Инициализируем счетчики
+    await initializeCounters();
 
     const orderData = await request.json();
     console.log('Получены данные заказа:', JSON.stringify(orderData, null, 2));
@@ -54,6 +57,8 @@ export async function POST(request: Request) {
       .eq('id', 'orderCounter')
       .single();
 
+    console.log('Результат получения счетчика:', { counter, counterError });
+
     if (counterError) {
       console.error('Ошибка при получении счетчика:', counterError);
       if (counterError.code === 'PGRST116') {
@@ -67,14 +72,17 @@ export async function POST(request: Request) {
     if (!counter) {
       console.log('Создание нового счетчика...');
       // Если счетчика нет, создаем его
-      const { error: insertError } = await supabase
+      const { data: newCounter, error: insertError } = await supabase
         .from('counters')
-        .insert([{ id: 'orderCounter', seq: 1 }]);
+        .insert([{ id: 'orderCounter', seq: 1 }])
+        .select()
+        .single();
       
       if (insertError) {
         console.error('Ошибка при создании счетчика:', insertError);
         throw insertError;
       }
+      console.log('Создан новый счетчик:', newCounter);
       orderNumber = '0001';
     } else {
       console.log('Инкремент существующего счетчика...');
@@ -90,8 +98,11 @@ export async function POST(request: Request) {
         console.error('Ошибка при обновлении счетчика:', updateError);
         throw updateError;
       }
+      console.log('Обновленный счетчик:', updatedCounter);
       orderNumber = updatedCounter.seq.toString().padStart(4, '0');
     }
+
+    console.log('Сформированный номер заказа:', orderNumber);
 
     // Добавляем стоимость доставки к общей сумме
     const totalWithDelivery = orderData.totalPrice + DELIVERY_COST;
