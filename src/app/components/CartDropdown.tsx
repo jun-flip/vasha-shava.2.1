@@ -195,7 +195,7 @@ export default function CartDropdown() {
                           <div className="flex items-center justify-between mt-1">
                             <div className="flex items-center space-x-2">
                           <SoundButton
-                                onClick={() => updateQuantity(item.id, (item.quantity || 1) - 1)}
+                            onClick={() => updateQuantity(item.id, (item.quantity || 1) - 1)}
                                 className="px-2 py-1 border rounded text-gray-700 hover:bg-[#8fc52f] hover:text-white transition-colors"
                           >
                             -
@@ -263,7 +263,7 @@ export default function CartDropdown() {
               </div>
             )}
             <div className="p-4 border-t bg-white rounded-b-lg">
-              <div className="flex justify-between items-center mb-4">
+                  <div className="flex justify-between items-center mb-4">
                 <span className="text-gray-900 font-medium">Итого:</span>
                 <span className="text-gray-900 font-medium">
                   {(() => {
@@ -276,7 +276,7 @@ export default function CartDropdown() {
               {items.length === 0 ? (
                 <div className="text-sm text-gray-500 mb-4">
                   Ваша корзина пуста
-                </div>
+                  </div>
               ) : items.reduce((total, item) => total + item.price * (item.quantity || 1), 0) < 1000 && (
                 <div className="text-sm text-gray-500 mb-4">
                   * Доставка 200₽ включена в сумму

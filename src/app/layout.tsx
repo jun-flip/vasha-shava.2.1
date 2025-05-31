@@ -35,8 +35,8 @@ export default function RootLayout({
           <NotificationProvider>
             <CartDropdownProvider>
               <SoundProvider>
-                <Navigation />
-                {children}
+          <Navigation />
+          {children}
                 <CartDropdownWrapper />
               </SoundProvider>
             </CartDropdownProvider>

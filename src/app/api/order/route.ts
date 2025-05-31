@@ -50,59 +50,20 @@ export async function POST(request: Request) {
     console.log('Получен новый заказ:', orderData);
     console.log('Комментарий к заказу:', orderData.comment);
 
-    // Получаем текущий счетчик заказов
-    console.log('Получение счетчика заказов...');
-    const { data: counter, error: counterError } = await supabase
-      .from('counters')
-      .select('seq')
-      .eq('id', 'orderCounter')
+    // Получаем и обновляем счетчик заказов в одной транзакции
+    console.log('Обновление счетчика заказов...');
+    const { data: updatedCounter, error: counterError } = await supabase
+      .rpc('increment_order_counter')
+      .select()
       .single();
 
-    console.log('Результат получения счетчика:', { counter, counterError });
-
     if (counterError) {
-      console.error('Ошибка при получении счетчика:', counterError);
-      if (counterError.code === 'PGRST116') {
-        console.log('Счетчик не найден, создаем новый...');
-      } else {
-        throw counterError;
-      }
+      console.error('Ошибка при обновлении счетчика:', counterError);
+      throw counterError;
     }
 
-    let orderNumber;
-    if (!counter) {
-      console.log('Создание нового счетчика...');
-      // Если счетчика нет, создаем его
-      const { data: newCounter, error: insertError } = await supabase
-        .from('counters')
-        .insert([{ id: 'orderCounter', seq: 1 }])
-        .select()
-        .single();
-      
-      if (insertError) {
-        console.error('Ошибка при создании счетчика:', insertError);
-        throw insertError;
-      }
-      console.log('Создан новый счетчик:', newCounter);
-      orderNumber = '0001';
-    } else {
-      console.log('Инкремент существующего счетчика...');
-      // Инкрементируем счетчик
-      const { data: updatedCounter, error: updateError } = await supabase
-        .from('counters')
-        .update({ seq: counter.seq + 1 })
-        .eq('id', 'orderCounter')
-        .select()
-        .single();
-
-      if (updateError) {
-        console.error('Ошибка при обновлении счетчика:', updateError);
-        throw updateError;
-      }
-      console.log('Обновленный счетчик:', updatedCounter);
-      orderNumber = updatedCounter.seq.toString().padStart(4, '0');
-    }
-
+    console.log('Обновленный счетчик:', updatedCounter);
+    const orderNumber = updatedCounter.seq.toString().padStart(4, '0');
     console.log('Сформированный номер заказа:', orderNumber);
 
     // Рассчитываем общую сумму заказа

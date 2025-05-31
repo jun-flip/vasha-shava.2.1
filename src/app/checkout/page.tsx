@@ -141,10 +141,10 @@ export default function Checkout() {
         }
       }));
     } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
     }
   };
 
