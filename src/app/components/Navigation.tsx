@@ -7,32 +7,29 @@ import Image from 'next/image';
 import { useCart } from '../context/CartContext';
 import { useCartDropdown } from '../context/CartDropdownContext';
 import { motion } from 'framer-motion';
+import { useClickSound } from '../../hooks/useClickSound';
 
 export default function Navigation() {
   const pathname = usePathname();
-  const { items, cartUpdateSignal, totalItems } = useCart();
+  const { items } = useCart();
   const { openCart } = useCartDropdown();
-  const [animateCart, setAnimateCart] = useState(false);
+  const handleClick = useClickSound();
 
-  useEffect(() => {
-    if (cartUpdateSignal > 0) {
-      setAnimateCart(true);
-      const timer = setTimeout(() => setAnimateCart(false), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [cartUpdateSignal]);
+  const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
   const cartVariants = {
     initial: { scale: 1 },
-    animate: { scale: [1, 1.1, 1], transition: { duration: 0.3, ease: "easeInOut" } },
+    animate: { scale: [1, 1.2, 1] }
   };
+
+  const animateCart = totalItems > 0;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#272727] shadow-md">
       <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between h-16">
           <div className="flex">
-            <Link href="/" className="flex items-center py-2">
+            <Link href="/" className="flex items-center py-2" onClick={handleClick(() => {})}>
               <div className="relative w-16 h-16 mr-2">
                 <Image
                   src="/Logo.png"
@@ -47,7 +44,7 @@ export default function Navigation() {
 
           <div className="flex items-center">
             <motion.button
-              onClick={openCart}
+              onClick={handleClick(openCart)}
               className="relative p-2 text-white hover:text-gray-200 transition-colors"
               variants={cartVariants}
               animate={animateCart ? "animate" : "initial"}

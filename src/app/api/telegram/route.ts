@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     saveOrderCounter(orderCounter);
 
     // Формируем ID заказа (счетчик с ведущими нулями)
-    const orderId = orderCounter.toString().padStart(4, '0');
+    const orderId = orderCounter.toString().padStart(4, '1');
 
     // Формируем сообщение для Telegram
     const message = `

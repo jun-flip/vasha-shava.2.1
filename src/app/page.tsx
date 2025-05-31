@@ -8,11 +8,14 @@ import MenuItem from "./components/MenuItem";
 import { motion } from "framer-motion";
 import Link from 'next/link';
 import Image from 'next/image';
+import { useClickSound } from '../hooks/useClickSound';
+import InstallPWAButton from './components/InstallPWAButton';
 
 export default function Home() {
   const { addItem } = useCart();
   const [selectedCategory, setSelectedCategory] = useState<Category>('all');
   const [isOpen, setIsOpen] = useState(false);
+  const handleClick = useClickSound();
   
   useEffect(() => {
     const checkIsOpen = () => {
@@ -43,6 +46,7 @@ export default function Home() {
 
   return (
     <main className="pt-32">
+      <InstallPWAButton />
       <div className="container mx-auto px-4">
         <div className="text-center">
           <motion.h1
@@ -71,6 +75,7 @@ export default function Home() {
             <div className="rounded-md shadow">
               <Link
                 href="/menu"
+                onClick={handleClick(() => {})}
                 className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#8fc52f] hover:bg-[#7db02a] md:py-4 md:text-lg md:px-10"
               >
                 МЕНЮ
