@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import Image from 'next/image';
 import { useCart } from '../context/CartContext';
 import { useCartDropdown } from '../context/CartDropdownContext';
 import { motion } from 'framer-motion';
@@ -31,12 +30,10 @@ export default function Navigation() {
           <div className="flex">
             <Link href="/" className="flex items-center py-2" onClick={handleClick(() => {})}>
               <div className="relative w-16 h-16 mr-2">
-                <Image
+                <img
                   src="/images/Logo.png"
-                  alt="Logo"
-                  width={150}
-                  height={50}
-                  priority
+                  alt="ЛАВАШ логотип"
+                  className="w-full h-full object-contain"
                 />
               </div>
               <span className="text-2xl font-extrabold text-white font-montserrat tracking-wider">ЛАВАШ</span>

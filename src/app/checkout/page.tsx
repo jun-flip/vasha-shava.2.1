@@ -165,33 +165,37 @@ export default function Checkout() {
         <h1 className="text-3xl font-bold mb-8 text-white">Оформление заказа</h1>
         
         <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow-md">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-900 mb-1">
-              Ваше имя
+          <div className="mb-4">
+            <label 
+              htmlFor="name" 
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Имя
             </label>
             <input
               type="text"
               id="name"
               name="name"
-              value={formData.name}
-              onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082]"
+              placeholder="Введите ваше имя"
             />
           </div>
 
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-900 mb-1">
+          <div className="mb-4">
+            <label 
+              htmlFor="phone" 
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Телефон
             </label>
             <input
               type="tel"
               id="phone"
               name="phone"
-              value={formData.phone}
-              onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082]"
+              placeholder="+7 (___) ___-__-__"
             />
           </div>
 
@@ -225,90 +229,37 @@ export default function Checkout() {
               />
             </div>
           ) : (
-            <div>
-              <label htmlFor="address" className="block text-sm font-medium text-gray-900 mb-1">
+            <div className="mb-4">
+              <label 
+                htmlFor="address" 
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Адрес доставки
               </label>
-              <div className="space-y-4">
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <input
-                      type="text"
-                      id="address.street"
-                      name="address.street"
-                      value={formData.address.street}
-                      onChange={handleChange}
-                      placeholder="Улица"
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
-                    />
-                  </div>
-                  <div className="w-24">
-                    <input
-                      type="text"
-                      id="address.house"
-                      name="address.house"
-                      value={formData.address.house}
-                      onChange={handleChange}
-                      placeholder="Дом"
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="w-24">
-                    <input
-                      type="text"
-                      id="address.apartment"
-                      name="address.apartment"
-                      value={formData.address.apartment}
-                      onChange={handleChange}
-                      placeholder="Кв."
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
-                    />
-                  </div>
-                  <div className="w-24">
-                    <input
-                      type="text"
-                      id="address.entrance"
-                      name="address.entrance"
-                      value={formData.address.entrance}
-                      onChange={handleChange}
-                      placeholder="Подъезд"
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
-                    />
-                  </div>
-                  <div className="w-24">
-                    <input
-                      type="text"
-                      id="address.floor"
-                      name="address.floor"
-                      value={formData.address.floor}
-                      onChange={handleChange}
-                      placeholder="Этаж"
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
-                    />
-                  </div>
-                </div>
-              </div>
+              <input
+                type="text"
+                id="address"
+                name="address"
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082]"
+                placeholder="Введите адрес доставки"
+              />
             </div>
           )}
 
-          <div>
-            <label htmlFor="comment" className="block text-sm font-medium text-gray-900 mb-1">
-              Комментарий к заказу (необязательно)
+          <div className="mb-4">
+            <label 
+              htmlFor="comment" 
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Комментарий к заказу
             </label>
             <textarea
               id="comment"
               name="comment"
-              value={formData.comment}
-              onChange={handleChange}
-              rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082]"
+              placeholder="Дополнительная информация для курьера"
             />
           </div>
 

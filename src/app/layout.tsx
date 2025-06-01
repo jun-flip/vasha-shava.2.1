@@ -22,13 +22,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="ru">
       <head>
-        <link rel="icon" href="/lavash.ico" sizes="any" />
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="description" content="ЛАВАШ - доставка вкусной еды" />
+        <link rel="icon" href="/lavash.ico" />
+        <title>ЛАВАШ - доставка вкусной еды</title>
       </head>
       <body className={`${inter.className} ${montserrat.variable}`}>
         <CartProvider>
