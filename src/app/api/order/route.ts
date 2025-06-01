@@ -114,6 +114,8 @@ ${orderData.items.map((item: any) => {
 }).join('\n')}
 • Доставка - ${DELIVERY_COST}₽
 
+💰 Сумма заказа: ${itemsTotal}₽
+🚚 Доставка: ${DELIVERY_COST}₽
 💵 Итого к оплате: ${totalWithDelivery}₽
 `;
 
