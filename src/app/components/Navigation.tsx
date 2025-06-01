@@ -32,10 +32,11 @@ export default function Navigation() {
             <Link href="/" className="flex items-center py-2" onClick={handleClick(() => {})}>
               <div className="relative w-16 h-16 mr-2">
                 <Image
-                  src="/Logo.png"
-                  alt="ЛАВАШ логотип"
-                  fill
-                  className="object-contain"
+                  src="/images/Logo.png"
+                  alt="Logo"
+                  width={150}
+                  height={50}
+                  priority
                 />
               </div>
               <span className="text-2xl font-extrabold text-white font-montserrat tracking-wider">ЛАВАШ</span>
