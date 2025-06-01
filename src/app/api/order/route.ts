@@ -1,27 +1,80 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+// Проверка наличия необходимых переменных окружения
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  throw new Error('NEXT_PUBLIC_SUPABASE_URL is not defined');
+}
+if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  throw new Error('NEXT_PUBLIC_SUPABASE_ANON_KEY is not defined');
+}
+if (!process.env.TELEGRAM_BOT_TOKEN) {
+  throw new Error('TELEGRAM_BOT_TOKEN is not defined');
+}
+if (!process.env.TELEGRAM_CHAT_ID) {
+  throw new Error('TELEGRAM_CHAT_ID is not defined');
+}
+
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
+
+// Функция валидации данных заказа
+function validateOrderData(data: any) {
+  const { name, phone, address, items, total } = data;
+  
+  if (!name || typeof name !== 'string' || name.trim().length === 0) {
+    throw new Error('Invalid name');
+  }
+  
+  if (!phone || typeof phone !== 'string' || phone.trim().length === 0) {
+    throw new Error('Invalid phone');
+  }
+  
+  if (!address || typeof address !== 'string' || address.trim().length === 0) {
+    throw new Error('Invalid address');
+  }
+  
+  if (!Array.isArray(items) || items.length === 0) {
+    throw new Error('Invalid items');
+  }
+  
+  if (typeof total !== 'number' || total <= 0) {
+    throw new Error('Invalid total');
+  }
+}
+
+// Функция для генерации номера заказа
+async function generateOrderNumber(): Promise<number> {
+  const { data: lastOrder, error } = await supabase
+    .from('orders')
+    .select('order_number')
+    .order('order_number', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error && error.code !== 'PGRST116') { // PGRST116 - no rows returned
+    console.error('Error getting last order number:', error);
+    throw new Error('Failed to generate order number');
+  }
+
+  return lastOrder ? lastOrder.order_number + 1 : 1;
+}
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    console.log('Received order data:', body);
+    
+    // Валидация данных
+    validateOrderData(body);
+    
     const { name, phone, address, items, total, comment } = body;
 
-    // Get next order number
-    const { data: orderNumber, error: orderNumberError } = await supabase
-      .rpc('get_next_order_number');
-
-    if (orderNumberError) {
-      console.error('Error getting order number:', orderNumberError);
-      return NextResponse.json(
-        { error: 'Failed to generate order number' },
-        { status: 500 }
-      );
-    }
+    // Generate order number
+    const orderNumber = await generateOrderNumber();
+    console.log('Generated order number:', orderNumber);
 
     // Calculate total with delivery
     const deliveryCost = 200;
@@ -53,10 +106,12 @@ export async function POST(request: Request) {
     if (orderError) {
       console.error('Error creating order:', orderError);
       return NextResponse.json(
-        { error: 'Failed to create order' },
+        { error: 'Failed to create order', details: orderError },
         { status: 500 }
       );
     }
+
+    console.log('Order created successfully:', order);
 
     // Send notification to Telegram
     const message = `🆕 Новый заказ #${orderNumber}
@@ -75,30 +130,35 @@ ${items.map((item: any) => {
 
 💰 Итого: ${finalTotal}₽${comment ? `\n\n💬 Комментарий: ${comment}` : ''}`;
 
-    const telegramResponse = await fetch(
-      `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          chat_id: process.env.TELEGRAM_CHAT_ID,
-          text: message,
-          parse_mode: 'HTML',
-        }),
-      }
-    );
+    try {
+      const telegramResponse = await fetch(
+        `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chat_id: process.env.TELEGRAM_CHAT_ID,
+            text: message,
+            parse_mode: 'HTML',
+          }),
+        }
+      );
 
-    if (!telegramResponse.ok) {
-      console.error('Error sending Telegram notification:', await telegramResponse.text());
+      if (!telegramResponse.ok) {
+        console.error('Error sending Telegram notification:', await telegramResponse.text());
+      }
+    } catch (telegramError) {
+      console.error('Error sending Telegram notification:', telegramError);
+      // Не возвращаем ошибку, так как это не критично для создания заказа
     }
 
     return NextResponse.json({ success: true, order });
   } catch (error) {
     console.error('Error processing order:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }
