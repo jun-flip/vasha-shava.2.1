@@ -26,6 +26,9 @@ const nextConfig = {
     });
     return config;
   },
+  assetPrefix: '/',
+  basePath: '',
+  trailingSlash: true,
 };
 
 module.exports = nextConfig; 

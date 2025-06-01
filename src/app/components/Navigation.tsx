@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 import { useCart } from '../context/CartContext';
 import { useCartDropdown } from '../context/CartDropdownContext';
 import { motion } from 'framer-motion';
