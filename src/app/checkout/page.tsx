@@ -177,7 +177,7 @@ export default function Checkout() {
               id="name"
               name="name"
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082] text-black"
               placeholder="Введите ваше имя"
             />
           </div>
@@ -194,7 +194,7 @@ export default function Checkout() {
               id="phone"
               name="phone"
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082] text-black"
               placeholder="+7 (___) ___-__-__"
             />
           </div>
@@ -241,7 +241,7 @@ export default function Checkout() {
                 id="address"
                 name="address"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082] text-black"
                 placeholder="Введите адрес доставки"
               />
             </div>
@@ -258,7 +258,7 @@ export default function Checkout() {
               id="comment"
               name="comment"
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082] text-black"
               placeholder="Дополнительная информация для курьера"
             />
           </div>
