@@ -42,7 +42,6 @@ export default function Checkout() {
     pickupTime: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showAddressFields, setShowAddressFields] = useState(false);
 
   // Загрузка сохраненных данных при монтировании компонента
   useEffect(() => {
@@ -85,8 +84,8 @@ export default function Checkout() {
         ? `Самовывоз в ${formData.pickupTime}`
         : `${formData.address.street}, д. ${formData.address.house}, кв. ${formData.address.apartment}, подъезд ${formData.address.entrance}, этаж ${formData.address.floor}`;
 
-      // Отправляем заказ в Telegram
-      const telegramResponse = await fetch('/api/telegram', {
+      // Отправляем заказ
+      const orderResponse = await fetch('/api/order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,21 +93,21 @@ export default function Checkout() {
         body: JSON.stringify({
           name: formData.name,
           phone: formData.phone,
-          time: formattedAddress,
+          address: formattedAddress,
           comment: formData.comment,
           items: items,
           total: total
         }),
       });
 
-      if (!telegramResponse.ok) {
-        throw new Error(`HTTP error! status: ${telegramResponse.status}`);
+      if (!orderResponse.ok) {
+        throw new Error(`HTTP error! status: ${orderResponse.status}`);
       }
 
-      const telegramResult = await telegramResponse.json();
+      const orderResult = await orderResponse.json();
 
-      if (!telegramResult.success) {
-        throw new Error(telegramResult.error || 'Failed to send order to Telegram');
+      if (!orderResult.success) {
+        throw new Error(orderResult.error || 'Failed to create order');
       }
 
       // Очищаем корзину и сохраненные данные формы
@@ -141,10 +140,10 @@ export default function Checkout() {
         }
       }));
     } else {
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
     }
   };
 
@@ -176,6 +175,8 @@ export default function Checkout() {
               type="text"
               id="name"
               name="name"
+              value={formData.name}
+              onChange={handleChange}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082] text-black"
               placeholder="Введите ваше имя"
@@ -193,6 +194,8 @@ export default function Checkout() {
               type="tel"
               id="phone"
               name="phone"
+              value={formData.phone}
+              onChange={handleChange}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082] text-black"
               placeholder="+7 (___) ___-__-__"
@@ -225,26 +228,110 @@ export default function Checkout() {
                 value={formData.pickupTime}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-gray-900"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-black"
               />
             </div>
           ) : (
-            <div className="mb-4">
-              <label 
-                htmlFor="address" 
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Адрес доставки
-              </label>
-              <input
-                type="text"
-                id="address"
-                name="address"
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082] text-black"
-                placeholder="Введите адрес доставки"
-              />
-            </div>
+            <>
+              <div className="mb-4">
+                <label 
+                  htmlFor="address.street" 
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Улица
+                </label>
+                <input
+                  type="text"
+                  id="address.street"
+                  name="address.street"
+                  value={formData.address.street}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082] text-black"
+                  placeholder="Введите улицу"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label 
+                    htmlFor="address.house" 
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Дом
+                  </label>
+                  <input
+                    type="text"
+                    id="address.house"
+                    name="address.house"
+                    value={formData.address.house}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082] text-black"
+                    placeholder="Номер дома"
+                  />
+                </div>
+
+                <div>
+                  <label 
+                    htmlFor="address.apartment" 
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Квартира
+                  </label>
+                  <input
+                    type="text"
+                    id="address.apartment"
+                    name="address.apartment"
+                    value={formData.address.apartment}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082] text-black"
+                    placeholder="Номер квартиры"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label 
+                    htmlFor="address.entrance" 
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Подъезд
+                  </label>
+                  <input
+                    type="text"
+                    id="address.entrance"
+                    name="address.entrance"
+                    value={formData.address.entrance}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082] text-black"
+                    placeholder="Номер подъезда"
+                  />
+                </div>
+
+                <div>
+                  <label 
+                    htmlFor="address.floor" 
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Этаж
+                  </label>
+                  <input
+                    type="text"
+                    id="address.floor"
+                    name="address.floor"
+                    value={formData.address.floor}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082] text-black"
+                    placeholder="Номер этажа"
+                  />
+                </div>
+              </div>
+            </>
           )}
 
           <div className="mb-4">
@@ -257,6 +344,8 @@ export default function Checkout() {
             <textarea
               id="comment"
               name="comment"
+              value={formData.comment}
+              onChange={handleChange}
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082] text-black"
               placeholder="Дополнительная информация для курьера"

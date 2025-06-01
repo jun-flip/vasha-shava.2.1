@@ -5,11 +5,11 @@ DROP TABLE IF EXISTS order_counter;
 -- Create a table for order counter
 CREATE TABLE order_counter (
     id SERIAL PRIMARY KEY,
-    current_count INTEGER NOT NULL DEFAULT 1116
+    current_count INTEGER NOT NULL DEFAULT 0000
 );
 
 -- Insert initial value
-INSERT INTO order_counter (current_count) VALUES (1116);
+INSERT INTO order_counter (current_count) VALUES (0000);
 
 -- Create a function to get and increment the counter
 CREATE OR REPLACE FUNCTION get_next_order_number()
