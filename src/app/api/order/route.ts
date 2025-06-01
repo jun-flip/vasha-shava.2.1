@@ -1,133 +1,80 @@
 import { NextResponse } from 'next/server';
-import { supabase, initializeCounters } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 
-const DELIVERY_COST = 200; // Стоимость доставки
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export async function POST(request: Request) {
   try {
-    console.log('Начало обработки заказа');
-    console.log('Environment variables:', {
-      SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? '***' : 'missing',
-      SUPABASE_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '***' : 'missing',
-      TELEGRAM_BOT: process.env.TELEGRAM_BOT_TOKEN ? '***' : 'missing',
-      TELEGRAM_CHAT: process.env.TELEGRAM_CHAT_ID ? '***' : 'missing'
-    });
+    const body = await request.json();
+    const { name, phone, address, items, total, comment } = body;
 
-    // Инициализируем счетчики
-    await initializeCounters();
+    // Get next order number
+    const { data: orderNumber, error: orderNumberError } = await supabase
+      .rpc('get_next_order_number');
 
-    const orderData = await request.json();
-    console.log('Получены данные заказа:', JSON.stringify(orderData, null, 2));
-    
-    // Validate required fields
-    const requiredFields = ['name', 'phone', 'address'];
-    const missingFields = requiredFields.filter(field => !orderData[field]);
-    
-    if (missingFields.length > 0) {
-      console.log('Отсутствуют обязательные поля:', missingFields);
+    if (orderNumberError) {
+      console.error('Error getting order number:', orderNumberError);
       return NextResponse.json(
-        { 
-          message: `Missing required fields: ${missingFields.join(', ')}`, 
-          success: false 
-        }, 
-        { status: 400 }
+        { error: 'Failed to generate order number' },
+        { status: 500 }
       );
     }
 
-    // Validate phone number format (basic validation)
-    const phoneRegex = /^\+?[1-9]\d{10,14}$/;
-    if (!phoneRegex.test(orderData.phone)) {
-      console.log('Неверный формат телефона:', orderData.phone);
-      return NextResponse.json(
-        { 
-          message: 'Invalid phone number format', 
-          success: false 
-        }, 
-        { status: 400 }
-      );
-    }
-
-    console.log('Получен новый заказ:', orderData);
-    console.log('Комментарий к заказу:', orderData.comment);
-
-    // Получаем и обновляем счетчик заказов в одной транзакции
-    console.log('Обновление счетчика заказов...');
-    const { data: updatedCounter, error: counterError } = await supabase
-      .rpc('increment_order_counter')
-      .select()
-      .single();
-
-    if (counterError) {
-      console.error('Ошибка при обновлении счетчика:', counterError);
-      throw counterError;
-    }
-
-    console.log('Обновленный счетчик:', updatedCounter);
-    const orderNumber = updatedCounter.seq.toString().padStart(4, '0');
-    console.log('Сформированный номер заказа:', orderNumber);
-
-    // Рассчитываем общую сумму заказа
-    const itemsTotal = orderData.items.reduce((sum: number, item: any) => {
+    // Calculate total with delivery
+    const deliveryCost = 200;
+    const itemsTotal = items.reduce((sum: number, item: any) => {
       const itemTotal = item.price * (item.quantity || 1);
-      const additionsTotal = (item.additions || []).reduce((addSum: number, add: any) => addSum + (add.price || 0), 0);
+      const additionsTotal = (item.additions || []).reduce((addSum: number, add: any) => addSum + add.price, 0);
       return sum + itemTotal + additionsTotal;
     }, 0);
+    const finalTotal = itemsTotal + deliveryCost;
 
-    // Добавляем стоимость доставки к общей сумме
-    const totalWithDelivery = itemsTotal + DELIVERY_COST;
-
-    console.log('Сохранение заказа в базу данных...');
-    // Сохраняем заказ
+    // Create order in database
     const { data: order, error: orderError } = await supabase
       .from('orders')
-      .insert([{
-        ...orderData,
-        order_number: `#${orderNumber}`,
-        total_price: totalWithDelivery,
-        delivery_cost: DELIVERY_COST,
-        created_at: new Date().toISOString()
-      }])
+      .insert([
+        {
+          order_number: orderNumber,
+          name,
+          phone,
+          address,
+          items,
+          total: finalTotal,
+          comment,
+          status: 'new'
+        }
+      ])
       .select()
       .single();
 
     if (orderError) {
-      console.error('Ошибка при сохранении заказа:', orderError);
-      throw orderError;
+      console.error('Error creating order:', orderError);
+      return NextResponse.json(
+        { error: 'Failed to create order' },
+        { status: 500 }
+      );
     }
 
-    console.log('Заказ успешно сохранен:', order);
+    // Send notification to Telegram
+    const message = `🆕 Новый заказ #${orderNumber}
 
-    // Формируем сообщение для Telegram
-    const message = `
-🆕 Новый заказ ${order.order_number}
-
-👤 Имя: ${orderData.name}
-📱 Телефон: ${orderData.phone}
-📍 Адрес: ${orderData.address}
-${orderData.comment ? `\n💬 Комментарий к заказу:\n${orderData.comment}` : ''}
+👤 Имя: ${name}
+📱 Телефон: ${phone}
+📍 Адрес: ${address}
 
 🍽 Заказ:
-${orderData.items.map((item: any) => {
-  const itemTotal = item.price * (item.quantity || 1);
-  const additions = (item.additions || []).map((add: any) => `   + ${add.name} (+${add.price}₽)`).join('\n');
-  return `• ${item.name} x${item.quantity || 1} - ${itemTotal}₽${additions ? '\n' + additions : ''}`;
+${items.map((item: any) => {
+  const additions = item.additions ? item.additions.map((add: any) => `   + ${add.name} (+${add.price}₽)`).join('\n') : '';
+  return `• ${item.name} x${item.quantity || 1} - ${item.price}₽${additions ? '\n' + additions : ''}`;
 }).join('\n')}
-• Доставка - ${DELIVERY_COST}₽
 
-💰 Сумма заказа: ${itemsTotal}₽
-🚚 Доставка: ${DELIVERY_COST}₽
-💵 Итого к оплате: ${totalWithDelivery}₽
-`;
+🚚 Доставка - ${deliveryCost}₽
 
-    console.log('Отправка уведомления в Telegram...');
-    console.log('Текст сообщения:', message);
+💰 Итого: ${finalTotal}₽${comment ? `\n\n💬 Комментарий: ${comment}` : ''}`;
 
-    if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) {
-      console.error('Отсутствуют переменные окружения для Telegram');
-      throw new Error('Missing Telegram environment variables');
-    }
-
-    // Отправляем уведомление в Telegram
     const telegramResponse = await fetch(
       `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
       {
@@ -144,26 +91,14 @@ ${orderData.items.map((item: any) => {
     );
 
     if (!telegramResponse.ok) {
-      const errorText = await telegramResponse.text();
-      console.error('Ошибка при отправке в Telegram:', errorText);
-      throw new Error(`Failed to send Telegram notification: ${errorText}`);
+      console.error('Error sending Telegram notification:', await telegramResponse.text());
     }
 
-    console.log('Уведомление в Telegram успешно отправлено');
-
-    return NextResponse.json({ 
-      success: true, 
-      orderId: order.id,
-      orderNumber: order.order_number,
-      totalWithDelivery
-    });
+    return NextResponse.json({ success: true, order });
   } catch (error) {
-    console.error('Критическая ошибка при создании заказа:', error);
+    console.error('Error processing order:', error);
     return NextResponse.json(
-      { 
-        error: 'Failed to create order',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      }, 
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
