@@ -77,7 +77,11 @@ export async function POST(request: Request) {
     console.log('Generated order number:', orderNumber);
 
     // Calculate total with delivery
-    const deliveryCost = 150;
+    const deliveryCost = address.toLowerCase().includes('самовывоз') || items.reduce((sum: number, item: any) => {
+      const itemTotal = item.price * (item.quantity || 1);
+      const additionsTotal = (item.additions || []).reduce((addSum: number, add: any) => addSum + add.price, 0);
+      return sum + itemTotal + additionsTotal;
+    }, 0) >= 500 ? 0 : 150;
     const itemsTotal = items.reduce((sum: number, item: any) => {
       const itemTotal = item.price * (item.quantity || 1);
       const additionsTotal = (item.additions || []).reduce((addSum: number, add: any) => addSum + add.price, 0);
