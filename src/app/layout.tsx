@@ -56,6 +56,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isProduction = process.env.NODE_ENV === 'production';
+
   return (
     <html lang="ru">
       <head>
@@ -77,8 +79,12 @@ export default function RootLayout({
             <InstallPWAButton />
           </CartDropdownProvider>
         </CartProvider>
-        <Analytics />
-        <SpeedInsights />
+        {isProduction && (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        )}
       </body>
     </html>
   );
