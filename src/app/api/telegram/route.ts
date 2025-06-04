@@ -72,7 +72,7 @@ ${orderData.items.map(item => {
 }).join('\n')}
 ${orderData.time.toLowerCase().includes('самовывоз') ? '' : orderData.total < 500 ? '\n🚚 Доставка - 150₽' : ''}
 
-💰 Итого: ${orderData.total}₽
+💰 Итого: ${orderData.time.toLowerCase().includes('самовывоз') ? orderData.total : orderData.total < 500 ? orderData.total + 150 : orderData.total}₽
     `.trim();
 
     const response = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
