@@ -16,7 +16,10 @@ export default function InstallPWAButton() {
 
   useEffect(() => {
     // Проверяем, установлено ли уже приложение
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    const isInstalled = window.matchMedia('(display-mode: standalone)').matches || 
+                       (window.navigator as any).standalone === true;
+    
+    if (isInstalled) {
       console.log('App is already installed');
       return;
     }
@@ -28,12 +31,40 @@ export default function InstallPWAButton() {
       setIsVisible(true);
     };
 
+    // Проверяем, доступна ли установка PWA
+    const checkInstallable = async () => {
+      try {
+        const result = await (window.navigator as any).getInstalledRelatedApps();
+        console.log('Installed apps:', result);
+      } catch (error) {
+        console.log('getInstalledRelatedApps not supported');
+      }
+    };
+
+    checkInstallable();
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    // Проверяем, был ли уже показан промпт установки
+    const checkInstallation = async () => {
+      try {
+        const result = await deferredPrompt?.userChoice;
+        if (result?.outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+          setIsVisible(false);
+        } else {
+          console.log('User dismissed the install prompt');
+        }
+      } catch (error) {
+        console.error('Error checking installation:', error);
+      }
+    };
+
+    checkInstallation();
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
-  }, []);
+  }, [deferredPrompt]);
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) {

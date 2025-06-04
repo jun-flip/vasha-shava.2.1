@@ -305,8 +305,8 @@ export default function Checkout() {
                     id="address.entrance"
                     name="address.entrance"
                     value={formData.address.entrance}
-                    onChange={handleChange}
-                    required
+              onChange={handleChange}
+              required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082] text-black"
                     placeholder="Номер подъезда"
             />
