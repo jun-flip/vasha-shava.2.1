@@ -8,10 +8,14 @@ import MenuItem from "./components/MenuItem";
 import { motion } from "framer-motion";
 import Link from 'next/link';
 import Image from 'next/image';
-import InstallPWAButton from './components/InstallPWAButton';
+import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
+import { useNotification } from "./context/NotificationContext";
 
 export default function Home() {
   const { addItem } = useCart();
+  const router = useRouter();
+  const { showNotification } = useNotification();
   const [selectedCategory, setSelectedCategory] = useState<Category>('all');
   const [isOpen, setIsOpen] = useState(false);
   
@@ -40,6 +44,8 @@ export default function Home() {
       price: item.price,
       image: item.image
     });
+    showNotification({ ...item, id: String(item.id) });
+    toast.success("Добавлено в корзину!");
   };
 
   return (
@@ -205,7 +211,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <InstallPWAButton />
     </main>
   );
 }
