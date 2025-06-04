@@ -5,13 +5,11 @@ import { Category } from '../../types';
 import { menuItems } from '../../data/menu';
 import MenuItem from '../components/MenuItem';
 import { motion } from 'framer-motion';
-import { useClickSound } from '../../hooks/useClickSound';
 
 const categories: Category[] = ['all', 'spicy', 'vegetarian', 'drinks'];
 
 export default function MenuPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category>('all');
-  const handleClick = useClickSound();
 
   const filteredItems = useMemo(() => 
     menuItems.filter(item => selectedCategory === 'all' || item.category === selectedCategory),
@@ -28,7 +26,7 @@ export default function MenuPage() {
                 key={category}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={handleClick(() => setSelectedCategory(category))}
+                onClick={() => setSelectedCategory(category)}
                 className={`px-4 sm:px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 shadow-md hover:shadow-lg ${
                   selectedCategory === category
                     ? 'bg-[#8fc52f] text-white'
@@ -44,16 +42,11 @@ export default function MenuPage() {
           </div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredItems.map((item) => (
             <MenuItem key={item.id} item={item} />
           ))}
-        </motion.div>
+        </div>
       </div>
     </main>
   );

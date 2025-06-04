@@ -1,22 +1,29 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { useClickSound } from '../../hooks/useClickSound';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function InstallPWAButton() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isVisible, setIsVisible] = useState(true); // Всегда видимый
   const [isInstallable, setIsInstallable] = useState(false);
-  const handleClick = useClickSound();
 
   useEffect(() => {
     const handler = (e: Event) => {
-      // Предотвращаем автоматическое появление баннера установки
+      console.log('PWA install prompt triggered');
       e.preventDefault();
-      // Сохраняем событие для последующего использования
       setDeferredPrompt(e);
       setIsInstallable(true);
     };
+
+    // Проверяем, установлено ли уже приложение
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      console.log('App is already installed');
+      setIsVisible(false);
+    } else {
+      console.log('App is not installed');
+      setIsVisible(true);
+    }
 
     window.addEventListener('beforeinstallprompt', handler);
 
@@ -26,46 +33,41 @@ export default function InstallPWAButton() {
   }, []);
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
+    console.log('Install button clicked');
+    if (!deferredPrompt) {
+      console.log('No deferred prompt available');
+      return;
+    }
 
-    // Показываем промпт установки
-    deferredPrompt.prompt();
+    try {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response to the install prompt: ${outcome}`);
+      
+      if (outcome === 'accepted') {
+        setIsVisible(false);
+      }
+    } catch (error) {
+      console.error('Error during installation:', error);
+    }
 
-    // Ждем, пока пользователь ответит на промпт
-    const { outcome } = await deferredPrompt.userChoice;
-
-    // Сбрасываем сохраненный промпт
     setDeferredPrompt(null);
-    setIsInstallable(false);
-
-    // Опционально: отправляем аналитику
-    console.log(`User response to the install prompt: ${outcome}`);
   };
 
-  if (!isInstallable) return null;
+  if (!isVisible) return null;
 
   return (
     <motion.button
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      onClick={handleClick(handleInstallClick)}
-      className="fixed bottom-4 right-4 bg-[#8fc52f] text-white p-3 rounded-full shadow-lg hover:bg-[#7db02a] transition-colors z-50"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
+      onClick={handleInstallClick}
+      className="fixed left-4 bottom-4 z-[100] bg-[#8fc52f] text-white px-6 py-3 rounded-lg shadow-lg hover:bg-[#7db02a] transition-colors flex items-center space-x-2 text-lg font-medium"
     >
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-        />
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
       </svg>
+      <span>Установить приложение</span>
     </motion.button>
   );
 } 

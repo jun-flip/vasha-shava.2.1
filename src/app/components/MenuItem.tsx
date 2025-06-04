@@ -61,50 +61,42 @@ export default function MenuItem({ item }: MenuItemProps) {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-lg shadow-md overflow-hidden"
     >
-      <div className="relative h-48">
-        <Image
-          src={item.image}
-          alt={item.name}
-          fill
-          className="object-cover"
-        />
-        {item.isSpicy && (
-          <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-sm">
-            Острое
-          </div>
-        )}
-      </div>
-        <div className="p-4 flex flex-col h-[220px]">
-          <div className="flex-1">
-        <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
-            <p className="text-gray-600 text-sm mt-1 line-clamp-2">{item.description}</p>
-            <div className="mt-2">
-              <p className="text-[#8fc52f] font-semibold">{item.price} ₽</p>
+      <div className="flex flex-col h-full">
+        <div className="relative w-full h-48 mb-3">
+          <Image
+            src={item.image}
+            alt={item.name}
+            fill
+            className="object-cover rounded-t-lg"
+          />
+          {item.isSpicy && (
+            <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-sm">
+              Острое
             </div>
-          </div>
-          <div className="mt-auto">
+          )}
+        </div>
+        <div className="flex-1 p-4 flex flex-col">
+          <h3 className="text-xl font-bold tracking-tight text-gray-900">{item.name}</h3>
+          <p className="mt-2 text-sm text-gray-600 font-medium">{item.description}</p>
+          <div className="mt-3 text-lg font-bold text-[#8fc52f]">{item.price} ₽</div>
+          <div className="mt-4 space-y-2">
             {item.additives && item.additives.length > 0 && (
-            <button
-              onClick={() => setIsAdditivesOpen(true)}
-                className="w-full py-2 rounded-lg bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors"
-            >
+              <button
+                onClick={() => setIsAdditivesOpen(true)}
+                className="w-full text-sm font-medium text-gray-700 hover:text-[#8fc52f] transition-colors"
+              >
                 Добавки
+              </button>
+            )}
+            <button
+              onClick={handleAddToCart}
+              className="w-full py-2 bg-[#8fc52f] text-white rounded-lg font-semibold hover:bg-[#7db02a] transition-colors"
+            >
+              В корзину
             </button>
-        )}
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-            onClick={handleAddToCart}
-              disabled={isAdding}
-              className={`mt-3 w-full py-2 rounded-lg transition-colors ${
-                isAdding
-                  ? 'bg-gray-300 cursor-not-allowed'
-                  : 'bg-[#8fc52f] hover:bg-[#7db02a] text-white'
-            }`}
-          >
-              {isAdding ? 'Добавлено' : 'В корзину'}
-            </motion.button>
           </div>
         </div>
+      </div>
       </motion.div>
 
       {/* Попап с добавками */}

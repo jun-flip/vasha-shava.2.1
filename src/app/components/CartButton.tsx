@@ -2,20 +2,18 @@
 
 import { useCart } from '../context/CartContext';
 import { useCartDropdown } from '../context/CartDropdownContext';
-import { useClickSound } from '../hooks/useClickSound';
 import SoundButton from './SoundButton';
 
 export default function CartButton() {
   const { items } = useCart();
   const { openCart } = useCartDropdown();
-  const handleClick = useClickSound();
 
   const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
   const totalPrice = items.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
 
   return (
     <SoundButton
-      onClick={handleClick(openCart)}
+      onClick={openCart}
       className="relative flex items-center space-x-2 bg-[#6de082] text-white px-4 py-2 rounded-lg hover:bg-[#5bc06f] transition-colors"
     >
       <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">

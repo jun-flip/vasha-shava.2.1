@@ -12,3 +12,47 @@ body {
   background: #272727;
   min-height: 100vh;
 }
+
+/* Глобальные стили для кнопок */
+@layer components {
+  .btn {
+    @apply relative overflow-hidden transition-all duration-200 ease-in-out;
+  }
+
+  .btn::after {
+    content: '';
+    @apply absolute inset-0 bg-white opacity-0 transition-opacity duration-200;
+  }
+
+  .btn:active::after {
+    @apply opacity-20;
+  }
+
+  .btn-primary {
+    @apply bg-[#8fc52f] text-white hover:bg-[#7db02a] active:bg-[#6ca025];
+  }
+
+  .btn-secondary {
+    @apply bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300;
+  }
+
+  .btn-danger {
+    @apply bg-red-500 text-white hover:bg-red-600 active:bg-red-700;
+  }
+
+  .btn-disabled {
+    @apply bg-gray-300 text-gray-500 cursor-not-allowed;
+  }
+
+  /* Анимация нажатия */
+  .btn-press {
+    @apply transform active:scale-95 transition-transform duration-100;
+  }
+
+  /* Тактильная обратная связь для мобильных устройств */
+  @media (hover: none) {
+    .btn:active {
+      @apply scale-95;
+    }
+  }
+}

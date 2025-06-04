@@ -6,7 +6,6 @@ import Navigation from "./components/Navigation";
 import { NotificationProvider } from "./context/NotificationContext";
 import { CartDropdownProvider } from './context/CartDropdownContext';
 import CartDropdownWrapper from './components/CartDropdownWrapper';
-import { SoundProvider } from './context/SoundContext';
 
 const inter = Inter({ subsets: ["latin"] });
 const montserrat = Montserrat({ 
@@ -29,21 +28,23 @@ export default function RootLayout({
     <html lang="ru">
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#000000" />
-        <meta name="description" content="ЛАВАШ - доставка вкусной еды" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <meta name="theme-color" content="#8fc52f" />
+        <meta name="description" content="Ваша Шава - доставка вкусной шаурмы" />
         <link rel="icon" href="/lavash.ico" />
-        <title>ЛАВАШ - доставка вкусной еды</title>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Ваша Шава" />
       </head>
       <body className={`${inter.className} ${montserrat.variable}`}>
         <CartProvider>
           <NotificationProvider>
             <CartDropdownProvider>
-              <SoundProvider>
-          <Navigation />
-          {children}
-                <CartDropdownWrapper />
-              </SoundProvider>
+              <Navigation />
+              <CartDropdownWrapper />
+              {children}
             </CartDropdownProvider>
           </NotificationProvider>
         </CartProvider>

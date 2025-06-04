@@ -8,14 +8,12 @@ import MenuItem from "./components/MenuItem";
 import { motion } from "framer-motion";
 import Link from 'next/link';
 import Image from 'next/image';
-import { useClickSound } from '../hooks/useClickSound';
 import InstallPWAButton from './components/InstallPWAButton';
 
 export default function Home() {
   const { addItem } = useCart();
   const [selectedCategory, setSelectedCategory] = useState<Category>('all');
   const [isOpen, setIsOpen] = useState(false);
-  const handleClick = useClickSound();
   
   useEffect(() => {
     const checkIsOpen = () => {
@@ -45,9 +43,8 @@ export default function Home() {
   };
 
   return (
-    <main className="pt-32">
-      <InstallPWAButton />
-      <div className="container mx-auto px-4">
+    <main className="min-h-screen pb-32">
+      <div className="container mx-auto px-4 pt-24">
         <div className="text-center">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
@@ -75,7 +72,6 @@ export default function Home() {
             <div className="rounded-md shadow">
               <Link
                 href="/menu"
-                onClick={handleClick(() => {})}
                 className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#8fc52f] hover:bg-[#7db02a] md:py-4 md:text-lg md:px-10"
               >
                 МЕНЮ
@@ -84,7 +80,7 @@ export default function Home() {
           </motion.div>
         </div>
 
-        <div className="mt-16">
+        <div className="mt-16 mb-16">
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -107,27 +103,18 @@ export default function Home() {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                         />
                       </svg>
                     </span>
                   </div>
-                  <h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">
-                    На Молодой Гвардии
+                  <h3 className="mt-8 text-xl font-bold text-gray-900 tracking-tight">
+                    Время работы
                   </h3>
-                  <p className="mt-2 text-base text-gray-500">
-                    ул. Молодой Гвардии, 27
+                  <p className="mt-2 text-base text-gray-600 font-medium">
+                    Ежедневно с 9:00 до 21:00
                   </p>
-                  <p className="mt-2 text-base text-gray-500">
-                    09:00 - 21:00
-                  </p>
-                  <p className={`mt-2 text-base font-medium ${isOpen ? 'text-[#8fc52f]' : 'text-red-500'}`}>
+                  <p className={`mt-2 text-base font-semibold ${isOpen ? 'text-[#8fc52f]' : 'text-red-500'}`}>
                     {isOpen ? 'Открыто' : 'Закрыто'}
                   </p>
                 </div>
@@ -160,17 +147,17 @@ export default function Home() {
                       </svg>
                     </span>
                   </div>
-                  <h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">
+                  <h3 className="mt-8 text-xl font-bold text-gray-900 tracking-tight">
                     Доставка
                   </h3>
-                  <p className="mt-2 text-base text-gray-500">
+                  <p className="mt-2 text-base text-gray-600 font-medium">
                     Быстрая доставка по городу
                   </p>
-                  <p className="mt-2 text-base text-gray-500">
-                    Среднее время доставки<br /><span className="text-[#8fc52f]">35 минут</span>
+                  <p className="mt-2 text-base text-gray-600 font-medium">
+                    Среднее время доставки<br /><span className="text-[#8fc52f] font-bold">35 минут</span>
                   </p>
-                  <p className="mt-2 text-base text-gray-500">
-                    Бесплатная доставка<br />от 1000₽
+                  <p className="mt-2 text-base text-gray-600 font-medium">
+                    Бесплатная доставка<br /><span className="text-[#8fc52f] font-bold">от 500₽</span>
                   </p>
                 </div>
               </div>
@@ -202,14 +189,14 @@ export default function Home() {
                       </svg>
                     </span>
                   </div>
-                  <h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">
+                  <h3 className="mt-8 text-xl font-bold text-gray-900 tracking-tight">
                     Предзаказ
                   </h3>
-                  <p className="mt-2 text-base text-gray-500">
+                  <p className="mt-2 text-base text-gray-600 font-medium">
                     Закажи за ранее
                   </p>
-                  <p className="mt-2 text-base text-gray-500">
-                    Среднее время приготовления<br /><span className="text-[#8fc52f]">5 минут</span>
+                  <p className="mt-2 text-base text-gray-600 font-medium">
+                    Среднее время приготовления<br /><span className="text-[#8fc52f] font-bold">5 минут</span>
                   </p>
                   <div className="mt-8"></div>
                 </div>
@@ -218,6 +205,7 @@ export default function Home() {
           </div>
         </div>
       </div>
+      <InstallPWAButton />
     </main>
   );
 }

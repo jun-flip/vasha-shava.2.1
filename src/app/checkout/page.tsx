@@ -140,10 +140,10 @@ export default function Checkout() {
         }
       }));
     } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
     }
   };
 
@@ -309,10 +309,10 @@ export default function Checkout() {
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6de082] text-black"
                     placeholder="Номер подъезда"
-                  />
-                </div>
+            />
+          </div>
 
-                <div>
+          <div>
                   <label 
                     htmlFor="address.floor" 
                     className="block text-sm font-medium text-gray-700 mb-1"

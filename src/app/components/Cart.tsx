@@ -195,8 +195,19 @@ export default function Cart() {
           <div className="mt-6 border-t border-gray-200 pt-4">
             <div className="flex justify-between items-center">
               <span className="text-lg font-medium text-gray-900">Итого:</span>
-              <span className="text-xl font-bold text-[#6de082]">{total} ₽</span>
+              <span className="text-xl font-bold text-[#6de082]">
+                {(() => {
+                  const subtotal = items.reduce((total, item) => total + item.price * (item.quantity || 1), 0);
+                  const deliveryCost = subtotal > 0 && subtotal < 500 ? 150 : 0;
+                  return `${subtotal + deliveryCost} ₽`;
+                })()}
+              </span>
             </div>
+            {items.length > 0 && items.reduce((total, item) => total + item.price * (item.quantity || 1), 0) < 500 && (
+              <div className="text-sm text-gray-500 mt-2">
+                * Доставка 150₽ включена в сумму
+              </div>
+            )}
             <button 
               onClick={handlePreorder}
               className="mt-4 w-full bg-[#6de082] text-white py-2 px-4 rounded-md hover:bg-[#5bc06f] transition-colors"

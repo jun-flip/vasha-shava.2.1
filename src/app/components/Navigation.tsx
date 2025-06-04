@@ -7,13 +7,11 @@ import Image from 'next/image';
 import { useCart } from '../context/CartContext';
 import { useCartDropdown } from '../context/CartDropdownContext';
 import { motion } from 'framer-motion';
-import { useClickSound } from '../../hooks/useClickSound';
 
 export default function Navigation() {
   const pathname = usePathname();
   const { items } = useCart();
   const { openCart } = useCartDropdown();
-  const handleClick = useClickSound();
 
   const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
@@ -29,7 +27,7 @@ export default function Navigation() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between h-16">
           <div className="flex">
-            <Link href="/" className="flex items-center py-2" onClick={handleClick(() => {})}>
+            <Link href="/" className="flex items-center py-2">
               <div className="relative w-16 h-16 mr-2">
                 <img
                   src="/images/Logo.png"
@@ -43,7 +41,7 @@ export default function Navigation() {
 
           <div className="flex items-center">
             <motion.button
-              onClick={handleClick(openCart)}
+              onClick={openCart}
               className="relative p-2 text-white hover:text-gray-200 transition-colors"
               variants={cartVariants}
               animate={animateCart ? "animate" : "initial"}
