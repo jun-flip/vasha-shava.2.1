@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "./context/CartContext";
 import { CartDropdownProvider } from "./context/CartDropdownContext";
+import { NotificationProvider } from "./context/NotificationContext";
 import { Toaster } from "react-hot-toast";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -57,6 +58,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const isProduction = process.env.NODE_ENV === 'production';
+  const isVercel = !!process.env.VERCEL;
 
   return (
     <html lang="ru">
@@ -73,13 +75,15 @@ export default function RootLayout({
       <body className={inter.className}>
         <CartProvider>
           <CartDropdownProvider>
-            <Navigation />
-            {children}
-            <Toaster position="top-center" />
-            <InstallPWAButton />
+            <NotificationProvider>
+              <Navigation />
+              {children}
+              <Toaster position="top-center" />
+              <InstallPWAButton />
+            </NotificationProvider>
           </CartDropdownProvider>
         </CartProvider>
-        {isProduction && (
+        {isVercel && (
           <>
             <Analytics />
             <SpeedInsights />

@@ -1,100 +1,95 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import SoundButton from './SoundButton';
 
-declare global {
-  interface BeforeInstallPromptEvent extends Event {
-    prompt: () => Promise<void>;
-    userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
-  }
-}
-
 export default function InstallPWAButton() {
-  const [isVisible, setIsVisible] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
-    // Проверяем, установлено ли уже приложение
-    const isInstalled = window.matchMedia('(display-mode: standalone)').matches || 
-                       (window.navigator as any).standalone === true;
-    
-    if (isInstalled) {
-      console.log('App is already installed');
-      return;
-    }
+    // Проверяем, является ли устройство мобильным
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+      const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+      setIsMobile(mobileRegex.test(userAgent));
+    };
 
-    // Проверяем, поддерживает ли браузер установку PWA
-    const isPWAInstallable = () => {
-      // Проверяем поддержку Service Worker
-      if (!('serviceWorker' in navigator)) {
-        console.log('Service Worker not supported');
-        return false;
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    // Проверяем, установлено ли уже приложение
+    const checkInstalled = async () => {
+      if ('getInstalledRelatedApps' in navigator) {
+        const relatedApps = await (navigator as any).getInstalledRelatedApps();
+        if (relatedApps.length > 0) {
+          setIsInstallable(false);
+          return;
+        }
+      }
+
+      // Проверяем, запущено ли приложение в standalone режиме
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        setIsInstallable(false);
+        return;
       }
 
       // Проверяем поддержку PWA
-      if (!('BeforeInstallPromptEvent' in window)) {
-        console.log('PWA installation not supported');
-        return false;
+      if ('serviceWorker' in navigator && 'BeforeInstallPromptEvent' in window) {
+        setIsInstallable(true);
       }
-
-      return true;
     };
 
+    checkInstalled();
+
+    // Обработчик события beforeinstallprompt
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      console.log('Before install prompt fired');
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
+      setDeferredPrompt(e);
+      setIsInstallable(true);
     };
-
-    // Если браузер поддерживает установку PWA, показываем кнопку
-    if (isPWAInstallable()) {
-      setIsVisible(true);
-    }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('resize', checkMobile);
     };
   }, []);
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) {
-      console.log('No deferred prompt available');
-      return;
-    }
+    if (!deferredPrompt) return;
 
-    try {
-      console.log('Showing install prompt');
-      await deferredPrompt.prompt();
-      const choiceResult = await deferredPrompt.userChoice;
-      
-      if (choiceResult.outcome === 'accepted') {
-        console.log('User accepted the install prompt');
-        setIsVisible(false);
-      } else {
-        console.log('User dismissed the install prompt');
-      }
-    } catch (error) {
-      console.error('Error during installation:', error);
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    if (outcome === 'accepted') {
+      console.log('Пользователь установил приложение');
+    } else {
+      console.log('Пользователь отклонил установку');
     }
+    
+    setDeferredPrompt(null);
+    setIsInstallable(false);
   };
 
-  if (!isVisible) return null;
+  // Показываем кнопку только на главной странице
+  if (!isMobile || !isInstallable || pathname !== '/') return null;
 
   return (
-    <div className="fixed bottom-4 left-4 z-50">
+    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
       <SoundButton
         onClick={handleInstallClick}
-        className="bg-[#8fc52f] text-white px-6 py-3 rounded-full shadow-lg hover:bg-[#7ab42a] transition-colors duration-200 flex items-center gap-2"
+        className="bg-[#8fc52f] text-white px-6 py-3 rounded-full shadow-lg hover:bg-[#7db02a] transition-colors flex items-center space-x-2"
       >
         <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
+          className="w-5 h-5"
           fill="none"
-          viewBox="0 0 24 24"
           stroke="currentColor"
+          viewBox="0 0 24 24"
         >
           <path
             strokeLinecap="round"
@@ -103,7 +98,7 @@ export default function InstallPWAButton() {
             d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
           />
         </svg>
-        Установить приложение
+        <span>Установить приложение</span>
       </SoundButton>
     </div>
   );

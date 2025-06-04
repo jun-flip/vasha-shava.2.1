@@ -10,6 +10,8 @@ import { useNotification } from '../context/NotificationContext';
 import { useCartDropdown } from '../context/CartDropdownContext';
 import SoundButton from './SoundButton';
 
+const isVercel = !!process.env.VERCEL;
+
 export default function CartDropdown() {
   const router = useRouter();
   const { items, removeItem, updateQuantity, addItem } = useCart();

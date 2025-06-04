@@ -83,7 +83,7 @@ export default function MenuItem({ item }: MenuItemProps) {
             {item.additives && item.additives.length > 0 && (
               <button
                 onClick={() => setIsAdditivesOpen(true)}
-                className="w-full text-sm font-medium text-gray-700 hover:text-[#8fc52f] transition-colors"
+                className="w-full text-sm font-medium text-white bg-gray-500 rounded-lg py-2"
               >
                 Добавки
               </button>

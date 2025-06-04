@@ -220,9 +220,9 @@ export default function Checkout() {
             <div>
               <label htmlFor="pickupTime" className="block text-sm font-medium text-gray-900 mb-1">
                 Время самовывоза
-              </label>
-              <input
-                type="time"
+            </label>
+            <input
+              type="time"
                 id="pickupTime"
                 name="pickupTime"
                 value={formData.pickupTime}
