@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "./context/CartContext";
+import { CartDropdownProvider } from "./context/CartDropdownContext";
 import { Toaster } from "react-hot-toast";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -69,10 +70,12 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <CartProvider>
-          <Navigation />
-          {children}
-          <Toaster position="top-center" />
-          <InstallPWAButton />
+          <CartDropdownProvider>
+            <Navigation />
+            {children}
+            <Toaster position="top-center" />
+            <InstallPWAButton />
+          </CartDropdownProvider>
         </CartProvider>
         <Analytics />
         <SpeedInsights />
