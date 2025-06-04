@@ -70,7 +70,7 @@ ${orderData.items.map(item => {
     : '';
   return `• ${item.name} x${item.quantity || 1} - ${item.price * (item.quantity || 1)}₽${additives}`;
 }).join('\n')}
-${orderData.total < 1000 ? '\n🚚 Доставка - 200₽' : ''}
+${orderData.total < 500 ? '\n🚚 Доставка - 150₽' : ''}
 
 💰 Итого: ${orderData.total}₽
     `.trim();
