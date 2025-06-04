@@ -24,47 +24,40 @@ export default function InstallPWAButton() {
       return;
     }
 
+    // Проверяем, поддерживает ли браузер установку PWA
+    const isPWAInstallable = () => {
+      // Проверяем поддержку Service Worker
+      if (!('serviceWorker' in navigator)) {
+        console.log('Service Worker not supported');
+        return false;
+      }
+
+      // Проверяем поддержку PWA
+      if (!('BeforeInstallPromptEvent' in window)) {
+        console.log('PWA installation not supported');
+        return false;
+      }
+
+      return true;
+    };
+
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       console.log('Before install prompt fired');
       setDeferredPrompt(e as BeforeInstallPromptEvent);
+    };
+
+    // Если браузер поддерживает установку PWA, показываем кнопку
+    if (isPWAInstallable()) {
       setIsVisible(true);
-    };
+    }
 
-    // Проверяем, доступна ли установка PWA
-    const checkInstallable = async () => {
-      try {
-        const result = await (window.navigator as any).getInstalledRelatedApps();
-        console.log('Installed apps:', result);
-      } catch (error) {
-        console.log('getInstalledRelatedApps not supported');
-      }
-    };
-
-    checkInstallable();
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    // Проверяем, был ли уже показан промпт установки
-    const checkInstallation = async () => {
-      try {
-        const result = await deferredPrompt?.userChoice;
-        if (result?.outcome === 'accepted') {
-          console.log('User accepted the install prompt');
-          setIsVisible(false);
-        } else {
-          console.log('User dismissed the install prompt');
-        }
-      } catch (error) {
-        console.error('Error checking installation:', error);
-      }
-    };
-
-    checkInstallation();
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
-  }, [deferredPrompt]);
+  }, []);
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) {
