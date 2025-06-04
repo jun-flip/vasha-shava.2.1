@@ -33,8 +33,8 @@ export default function RootLayout({
         <CartProvider>
           <CartDropdownProvider>
             <NotificationProvider>
-              <Navigation />
-              {children}
+          <Navigation />
+          {children}
               <Toaster position="top-center" />
             </NotificationProvider>
           </CartDropdownProvider>

@@ -79,6 +79,20 @@ export default function Checkout() {
     try {
       setIsSubmitting(true);
 
+      // Проверка времени самовывоза
+      if (formData.isPickup) {
+        const [hours, minutes] = formData.pickupTime.split(':').map(Number);
+        const pickupTime = hours * 60 + minutes;
+        const openTime = 9 * 60; // 9:00
+        const closeTime = 21 * 60; // 21:00
+
+        if (pickupTime < openTime || pickupTime > closeTime) {
+          alert('Пожалуйста, выберите время самовывоза в период работы с 9:00 до 21:00');
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       // Форматируем адрес или время самовывоза для отправки
       const formattedAddress = formData.isPickup 
         ? `Самовывоз в ${formData.pickupTime}`
@@ -220,16 +234,21 @@ export default function Checkout() {
             <div>
               <label htmlFor="pickupTime" className="block text-sm font-medium text-gray-900 mb-1">
                 Время самовывоза
-            </label>
-            <input
-              type="time"
+              </label>
+              <input
+                type="time"
                 id="pickupTime"
                 name="pickupTime"
                 value={formData.pickupTime}
                 onChange={handleChange}
+                min="09:00"
+                max="21:00"
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8fc52f] focus:border-[#8fc52f] outline-none text-black"
               />
+              <p className="mt-1 text-sm text-gray-500">
+                Время работы: с 9:00 до 21:00
+              </p>
             </div>
           ) : (
             <>

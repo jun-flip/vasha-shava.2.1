@@ -130,14 +130,14 @@ export default function CartDropdown() {
                         <div className="flex items-center justify-between mt-1">
                           <div className="flex items-center space-x-2">
                             <SoundButton
-                              onClick={() => updateQuantity(item.id, (item.quantity || 1) - 1)}
+                            onClick={() => updateQuantity(item.id, (item.quantity || 1) - 1)}
                               className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
-                            >
-                              -
+                          >
+                            -
                             </SoundButton>
                             <span className="text-sm text-gray-900">{item.quantity || 1}</span>
                             <SoundButton
-                              onClick={() => updateQuantity(item.id, (item.quantity || 1) + 1)}
+                            onClick={() => updateQuantity(item.id, (item.quantity || 1) + 1)}
                               className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
                             >
                               +
@@ -188,7 +188,7 @@ export default function CartDropdown() {
                       <SoundButton
                         onClick={() => handleAddDrink(drink)}
                         className="px-3 py-1 bg-[#8fc52f] text-white text-sm rounded-lg hover:bg-[#7db02a] transition-colors"
-                      >
+                  >
                         Добавить
                       </SoundButton>
                     </div>
