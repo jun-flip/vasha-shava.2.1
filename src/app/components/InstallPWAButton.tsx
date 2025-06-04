@@ -4,14 +4,10 @@ import { useState, useEffect } from 'react';
 import SoundButton from './SoundButton';
 
 declare global {
-  interface WindowEventMap {
-    beforeinstallprompt: BeforeInstallPromptEvent;
+  interface BeforeInstallPromptEvent extends Event {
+    prompt: () => Promise<void>;
+    userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
   }
-}
-
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
 export default function InstallPWAButton() {
@@ -25,36 +21,19 @@ export default function InstallPWAButton() {
       return;
     }
 
-    const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent) => {
-      console.log('Before install prompt fired');
+    const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e);
+      console.log('Before install prompt fired');
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
       setIsVisible(true);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
-    // Проверяем, был ли уже показан промпт установки
-    const checkInstallation = async () => {
-      try {
-        const result = await deferredPrompt?.userChoice;
-        if (result?.outcome === 'accepted') {
-          console.log('User accepted the install prompt');
-          setIsVisible(false);
-        } else {
-          console.log('User dismissed the install prompt');
-        }
-      } catch (error) {
-        console.error('Error checking installation:', error);
-      }
-    };
-
-    checkInstallation();
-
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
-  }, [deferredPrompt]);
+  }, []);
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) {
