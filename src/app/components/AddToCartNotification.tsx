@@ -18,7 +18,7 @@ export default function AddToCartNotification({ isVisible, item, onClose }: AddT
           transition={{ type: "spring", duration: 0.5 }}
           className="fixed md:bottom-4 md:right-4 bottom-1/2 right-1/2 transform md:transform-none translate-x-1/2 md:translate-x-0 translate-y-1/2 md:translate-y-0 
             bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-3 md:p-4 
-            max-w-[90%] md:max-w-sm w-[280px] md:w-full z-[9999] 
+            max-w-[95vw] w-full md:max-w-sm md:w-full z-[9999] 
             border border-[#6de082]/50"
         >
           <div className="flex justify-between items-start">

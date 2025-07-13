@@ -25,9 +25,9 @@ export default function Navigation() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#272727] shadow-md">
-        <div className="container mx-auto px-4 py-4">
-        <div className="flex justify-between h-16">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#272727] shadow-md w-full max-w-[100vw]">
+        <div className="w-full max-w-[100vw] px-2 sm:px-4 py-4 mx-auto">
+          <div className="flex justify-between h-16 w-full">
           <div className="flex">
             <Link href="/" className="flex items-center py-2">
                 <div className="relative w-16 h-16 mr-2">

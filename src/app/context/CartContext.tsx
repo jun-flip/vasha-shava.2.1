@@ -19,36 +19,58 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [cartUpdateSignal, setCartUpdateSignal] = useState(0);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Загрузка корзины из localStorage при монтировании
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedCart = localStorage.getItem('cart');
+      console.log('CartContext: загружаем корзину из localStorage:', savedCart);
       if (savedCart) {
         try {
-          setItems(JSON.parse(savedCart));
+          const parsedItems = JSON.parse(savedCart);
+          console.log('CartContext: парсим корзину:', parsedItems);
+          setItems(parsedItems);
+          console.log('CartContext: корзина загружена:', parsedItems);
         } catch (error) {
           console.error('Ошибка при загрузке корзины:', error);
           localStorage.removeItem('cart'); // Очищаем некорректные данные
         }
+      } else {
+        console.log('CartContext: корзина в localStorage не найдена');
       }
+      setIsInitialized(true);
     }
   }, []);
 
-  // Сохранение корзины в localStorage при изменении
+  // Сохранение корзины в localStorage при изменении, но только после инициализации
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && isInitialized) {
+      console.log('CartContext: useEffect для сохранения корзины вызван');
+      console.log('CartContext: isInitialized:', isInitialized);
+      console.log('CartContext: items для сохранения:', items);
+      console.log('CartContext: items.length:', items.length);
+      console.log('CartContext: сохраняем корзину в localStorage:', items);
       localStorage.setItem('cart', JSON.stringify(items));
+      console.log('CartContext: корзина сохранена в localStorage');
+    } else {
+      console.log('CartContext: useEffect для сохранения корзины пропущен');
+      console.log('CartContext: typeof window !== undefined:', typeof window !== 'undefined');
+      console.log('CartContext: isInitialized:', isInitialized);
     }
-  }, [items]);
+  }, [items, isInitialized]);
 
   const addItem = (newItem: CartItem) => {
+    console.log('CartContext: addItem вызвана с:', newItem);
+    console.log('CartContext: текущее состояние items перед addItem:', items);
     setItems(prevItems => {
+      console.log('CartContext: текущие товары в корзине:', prevItems);
       // Проверяем, есть ли уже такой товар с такими же добавками
       const existingItem = prevItems.find(item => item.id === newItem.id);
       
       if (existingItem) {
         // Если товар с такими же добавками уже есть, увеличиваем количество
+        console.log('CartContext: товар уже существует, увеличиваем количество');
         return prevItems.map(item =>
           item.id === newItem.id
             ? { ...item, quantity: (item.quantity || 1) + 1 }
@@ -57,16 +79,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       
       // Если такого товара с такими добавками нет, добавляем новую позицию
+      console.log('CartContext: добавляем новый товар');
       return [...prevItems, { ...newItem, quantity: 1 }];
     });
     setCartUpdateSignal(prev => prev + 1);
   };
 
   const removeItem = (id: string) => {
+    console.log('CartContext: removeItem вызвана для id:', id);
+    console.log('CartContext: текущее состояние items перед removeItem:', items);
     setItems(prevItems => prevItems.filter(item => item.id !== id));
   };
 
   const updateQuantity = (id: string, quantity: number) => {
+    console.log('CartContext: updateQuantity вызвана для id:', id, 'quantity:', quantity);
+    console.log('CartContext: текущее состояние items перед updateQuantity:', items);
     if (quantity < 1) {
       removeItem(id);
       return;
@@ -80,6 +107,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const clearCart = () => {
+    console.log('CartContext: clearCart вызвана');
+    console.log('CartContext: stack trace:', new Error().stack);
+    console.log('CartContext: текущее состояние items перед clearCart:', items);
     setItems([]);
   };
 

@@ -92,7 +92,7 @@ export default function CartDropdown() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ type: "spring", duration: 0.5 }}
-            className="fixed top-[64px] left-[calc(50%-140px)] sm:left-[calc(50%-175px)] md:left-[calc(50%-250px)] w-[280px] sm:w-[350px] md:w-[500px] h-[80vh] bg-white rounded-lg shadow-xl z-50 flex flex-col"
+            className="fixed top-[64px] left-1/2 -translate-x-1/2 w-full max-w-[95vw] sm:w-[350px] md:w-[500px] h-[80vh] bg-white rounded-lg shadow-xl z-50 flex flex-col"
           >
             <div className="flex justify-between items-center p-4 border-b">
               <h3 className="text-lg font-semibold text-gray-900">Корзина</h3>

@@ -26,7 +26,7 @@ const EXPIRY_DAYS = 30;
 
 export default function Checkout() {
   const router = useRouter();
-  const { clearCart, items, total } = useCart();
+  const { clearCart, items, total, addItem } = useCart();
   const [formData, setFormData] = useState<FormData>({
     name: '',
     phone: '',
@@ -42,42 +42,150 @@ export default function Checkout() {
     pickupTime: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Загрузка сохраненных данных при монтировании компонента
+  // Загрузка сохраненных данных при монтировании компонента и при фокусе окна
   useEffect(() => {
-    const savedData = localStorage.getItem(STORAGE_KEY);
-    if (savedData) {
-      try {
-        const { data, expiry } = JSON.parse(savedData);
-        // Проверяем, не истек ли срок хранения
-        if (new Date().getTime() < expiry) {
-          setFormData(data);
-        } else {
-          // Если срок истек, удаляем данные
+    const loadSavedData = () => {
+      const savedData = localStorage.getItem(STORAGE_KEY);
+      if (savedData) {
+        try {
+          const { data, expiry } = JSON.parse(savedData);
+          console.log('Checkout: данные из localStorage', data);
+          if (new Date().getTime() < expiry) {
+            setFormData(data);
+          } else {
+            localStorage.removeItem(STORAGE_KEY);
+          }
+        } catch (error) {
+          console.error('Ошибка при загрузке сохраненных данных:', error);
           localStorage.removeItem(STORAGE_KEY);
         }
-      } catch (error) {
-        console.error('Ошибка при загрузке сохраненных данных:', error);
-        localStorage.removeItem(STORAGE_KEY);
+      } else {
+        console.log('Checkout: localStorage пуст');
       }
-    }
+      setIsInitialized(true);
+    };
+    loadSavedData();
+    window.addEventListener('focus', loadSavedData);
+    return () => {
+      window.removeEventListener('focus', loadSavedData);
+    };
   }, []);
 
-  // Сохранение данных при изменении формы
+  // Синхронизация данных из localStorage с корзиной, если корзина пустая
   useEffect(() => {
+    console.log('Checkout: useEffect для синхронизации корзины вызван');
+    console.log('Checkout: isInitialized:', isInitialized);
+    console.log('Checkout: items.length:', items.length);
+    console.log('Checkout: текущие товары в корзине:', items);
+    
+    // Не загружаем данные из localStorage, если в корзине уже есть товары
+    if (isInitialized && items.length === 0) {
+      const savedCart = localStorage.getItem('cart');
+      console.log('Checkout: проверяем localStorage cart:', savedCart);
+      
+      if (savedCart) {
+        try {
+          const cartItems = JSON.parse(savedCart);
+          console.log('Checkout: загружаем корзину из localStorage', cartItems);
+          console.log('Checkout: тип cartItems:', typeof cartItems);
+          console.log('Checkout: Array.isArray(cartItems):', Array.isArray(cartItems));
+          console.log('Checkout: cartItems.length:', cartItems?.length);
+          
+          if (Array.isArray(cartItems) && cartItems.length > 0) {
+            console.log('Checkout: начинаем добавлять товары в корзину');
+            cartItems.forEach((item, index) => {
+              console.log('Checkout: добавляем товар в корзину:', item);
+              // Добавляем товар с правильным количеством
+              for (let i = 0; i < (item.quantity || 1); i++) {
+                addItem({
+                  id: item.id || `restored-${Date.now()}-${Math.random()}`,
+                  name: item.name,
+                  price: item.price,
+                  quantity: 1, // Добавляем по одному, но item.quantity раз
+                  image: item.image || '',
+                  selectedAdditives: item.selectedAdditives || []
+                });
+              }
+            });
+            console.log('Checkout: все товары добавлены в корзину');
+          } else {
+            console.log('Checkout: корзина в localStorage пустая или некорректная');
+            console.log('Checkout: cartItems:', cartItems);
+            console.log('Checkout: typeof cartItems:', typeof cartItems);
+            console.log('Checkout: cartItems === null:', cartItems === null);
+            console.log('Checkout: cartItems === undefined:', cartItems === undefined);
+            
+            // Попробуем найти данные в checkout_form_data
+            const savedFormData = localStorage.getItem('checkout_form_data');
+            console.log('Checkout: проверяем checkout_form_data:', savedFormData);
+            if (savedFormData) {
+              try {
+                const { data, expiry } = JSON.parse(savedFormData);
+                console.log('Checkout: данные checkout_form_data:', data);
+                console.log('Checkout: expiry:', expiry);
+                console.log('Checkout: текущее время:', new Date().getTime());
+                if (new Date().getTime() < expiry && data.fromBot) {
+                  console.log('Checkout: найдены данные от бота, но корзина пустая');
+                  // Здесь можно попробовать восстановить данные из других источников
+                }
+              } catch (error) {
+                console.error('Ошибка при парсинге checkout_form_data:', error);
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Ошибка при загрузке корзины из localStorage:', error);
+        }
+      } else {
+        console.log('Checkout: корзина в localStorage не найдена');
+        
+        // Проверяем все ключи в localStorage
+        console.log('Checkout: все ключи в localStorage:', Object.keys(localStorage));
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key) {
+            console.log(`Checkout: localStorage[${key}]:`, localStorage.getItem(key));
+          }
+        }
+      }
+    } else if (isInitialized && items.length > 0) {
+      console.log('Checkout: корзина уже содержит товары, не загружаем из localStorage');
+      console.log('Checkout: текущие товары в корзине:', items);
+    }
+  }, [isInitialized, items.length, addItem]);
+
+  // Сохранение данных при изменении формы, только после инициализации
+  useEffect(() => {
+    if (!isInitialized) return;
     const expiry = new Date().getTime() + (EXPIRY_DAYS * 24 * 60 * 60 * 1000);
     const dataToSave = {
       data: formData,
       expiry
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
-  }, [formData]);
+  }, [formData, isInitialized]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
       setIsSubmitting(true);
+
+      // Проверяем, что корзина не пустая
+      if (items.length === 0) {
+        alert('Корзина пуста. Пожалуйста, добавьте товары в корзину перед оформлением заказа.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Проверяем, что общая сумма больше 0
+      if (total <= 0) {
+        alert('Сумма заказа должна быть больше 0.');
+        setIsSubmitting(false);
+        return;
+      }
 
       // Проверка времени самовывоза
       if (formData.isPickup) {
@@ -98,24 +206,32 @@ export default function Checkout() {
         ? `Самовывоз в ${formData.pickupTime}`
         : `${formData.address.street}, д. ${formData.address.house}, кв. ${formData.address.apartment}, подъезд ${formData.address.entrance}, этаж ${formData.address.floor}`;
 
+      // Логируем данные перед отправкой
+      const orderData = {
+        name: formData.name,
+        phone: formData.phone,
+        address: formattedAddress,
+        comment: formData.comment,
+        items: items,
+        total: total
+      };
+      console.log('Отправляемые данные заказа:', orderData);
+      console.log('Корзина:', items);
+      console.log('Общая сумма:', total);
+
       // Отправляем заказ
       const orderResponse = await fetch('/api/order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: formData.name,
-          phone: formData.phone,
-          address: formattedAddress,
-          comment: formData.comment,
-          items: items,
-          total: total
-        }),
+        body: JSON.stringify(orderData),
       });
 
       if (!orderResponse.ok) {
-        throw new Error(`HTTP error! status: ${orderResponse.status}`);
+        const errorData = await orderResponse.json().catch(() => ({}));
+        console.error('Ошибка API:', errorData);
+        throw new Error(`HTTP error! status: ${orderResponse.status} - ${errorData.error || 'Unknown error'}`);
       }
 
       const orderResult = await orderResponse.json();
@@ -130,7 +246,7 @@ export default function Checkout() {
       router.push('/success');
     } catch (error) {
       console.error('Ошибка при отправке заказа:', error);
-      alert('Произошла ошибка при оформлении заказа. Попробуйте еще раз.');
+      alert(`Произошла ошибка при оформлении заказа: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -166,8 +282,8 @@ export default function Checkout() {
   };
 
   return (
-    <main className="min-h-screen p-8">
-      <div className="max-w-2xl mx-auto relative">
+    <main className="min-h-screen p-4 sm:p-8">
+      <div className="max-w-2xl w-full mx-auto relative px-2 sm:px-0">
         <button
           onClick={handleClose}
           className="absolute top-0 right-0 bg-[#8fc52f] text-white px-4 py-2 rounded-lg hover:bg-[#7db02a] transition-colors"
@@ -175,9 +291,9 @@ export default function Checkout() {
           В меню
         </button>
 
-        <h1 className="text-3xl font-bold mb-8 text-white">Оформление заказа</h1>
+        <h1 className="text-3xl font-bold mb-8 text-white text-center">Оформление заказа</h1>
         
-        <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow-md">
+        <form onSubmit={handleSubmit} className="space-y-6 bg-white p-4 sm:p-6 rounded-lg shadow-md w-full">
           <div className="mb-4">
             <label 
               htmlFor="name" 
@@ -189,6 +305,7 @@ export default function Checkout() {
               type="text"
               id="name"
               name="name"
+              autoComplete="name"
               value={formData.name}
               onChange={handleChange}
               required
@@ -208,6 +325,7 @@ export default function Checkout() {
               type="tel"
               id="phone"
               name="phone"
+              autoComplete="tel"
               value={formData.phone}
               onChange={handleChange}
               required
@@ -263,6 +381,7 @@ export default function Checkout() {
                   type="text"
                   id="address.street"
                   name="address.street"
+                  autoComplete="street-address"
                   value={formData.address.street}
                   onChange={handleChange}
                   required
@@ -283,6 +402,7 @@ export default function Checkout() {
                     type="text"
                     id="address.house"
                     name="address.house"
+                    autoComplete="address-line2"
                     value={formData.address.house}
                     onChange={handleChange}
                     required
@@ -302,6 +422,7 @@ export default function Checkout() {
                     type="text"
                     id="address.apartment"
                     name="address.apartment"
+                    autoComplete="address-line3"
                     value={formData.address.apartment}
                     onChange={handleChange}
                     required
@@ -323,6 +444,7 @@ export default function Checkout() {
                     type="text"
                     id="address.entrance"
                     name="address.entrance"
+                    autoComplete="address-line4"
                     value={formData.address.entrance}
               onChange={handleChange}
               required
@@ -342,6 +464,7 @@ export default function Checkout() {
                     type="text"
                     id="address.floor"
                     name="address.floor"
+                    autoComplete="address-level4"
                     value={formData.address.floor}
                     onChange={handleChange}
                     required
@@ -363,6 +486,7 @@ export default function Checkout() {
             <textarea
               id="comment"
               name="comment"
+              autoComplete="off"
               value={formData.comment}
               onChange={handleChange}
               rows={3}
