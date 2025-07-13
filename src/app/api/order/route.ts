@@ -1,16 +1,15 @@
 import { NextResponse } from 'next/server';
 import {
-  getLastOrderNumber,
   createOrder,
   initializeDatabase
 } from '@/lib/database';
 
 // Проверка наличия необходимых переменных окружения для Telegram
-if (!process.env.TELEGRAM_BOT_TOKEN) {
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+
+if (!TELEGRAM_BOT_TOKEN) {
   console.warn('TELEGRAM_BOT_TOKEN is not defined - Telegram notifications will be disabled');
-}
-if (!process.env.TELEGRAM_CHAT_ID) {
-  console.warn('TELEGRAM_CHAT_ID is not defined - Telegram notifications will be disabled');
 }
 
 // Инициализация базы данных (на всякий случай)
@@ -36,6 +35,61 @@ function validateOrderData(data: any) {
   }
 }
 
+// Получить последний номер заказа из Telegram
+async function getLastOrderNumberFromTelegram() {
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+    return 0;
+  }
+  const updatesUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates`;
+  const res = await fetch(updatesUrl);
+  const data = await res.json();
+  let lastOrderNumber = 0;
+  if (data.result) {
+    for (let i = data.result.length - 1; i >= 0; i--) {
+      const msg = data.result[i].message;
+      if (
+        msg &&
+        msg.chat &&
+        String(msg.chat.id) === String(TELEGRAM_CHAT_ID) &&
+        msg.text &&
+        msg.text.includes('🆕 Новый заказ #')
+      ) {
+        const match = msg.text.match(/#(\d+)/);
+        if (match) {
+          lastOrderNumber = parseInt(match[1], 10);
+          break;
+        }
+      }
+    }
+  }
+  return lastOrderNumber;
+}
+
+// Если chat_id не указан — отправить сообщение с chat_id и инструкцией
+async function trySendChatIdInstruction() {
+  if (!TELEGRAM_BOT_TOKEN) return;
+  // Получаем последние апдейты
+  const updatesUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates`;
+  const res = await fetch(updatesUrl);
+  const data = await res.json();
+  if (data.result) {
+    for (let i = data.result.length - 1; i >= 0; i--) {
+      const msg = data.result[i].message;
+      if (msg && msg.chat && msg.chat.id && msg.text) {
+        // Отправим в этот чат инструкцию
+        const chatId = msg.chat.id;
+        const text = `Ваш chat_id: ${chatId}\nДобавьте его в .env.local как TELEGRAM_CHAT_ID=...\n\nЭто нужно для корректной работы счётчика заказов.`;
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, text })
+        });
+        break;
+      }
+    }
+  }
+}
+
 // Функция для отправки уведомления в Telegram
 async function sendTelegramNotification(orderData: {
   order_number: number;
@@ -47,43 +101,28 @@ async function sendTelegramNotification(orderData: {
   comment?: string;
   deliveryCost: number;
 }) {
-  if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) {
-    console.log('Telegram notifications disabled - missing environment variables');
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
     return;
   }
-
-  const message = `🆕 Новый заказ #${orderData.order_number}
-
-👤 Имя: ${orderData.name}
-📱 Телефон: ${orderData.phone}
-📍 Адрес: ${orderData.address}
-
-🍽 Заказ:
-${orderData.items.map((item: any) => {
-  const additions = item.additions ? item.additions.map((add: any) => `   + ${add.name} (+${add.price}₽)`).join('\n') : '';
-  return `• ${item.name} x${item.quantity || 1} - ${item.price}₽${additions ? '\n' + additions : ''}`;
-}).join('\n')}
-
-🚚 Доставка - ${orderData.deliveryCost}₽
-
-💰 Итого: ${orderData.total}₽${orderData.comment ? `\n\n💬 Комментарий: ${orderData.comment}` : ''}`;
-
+  const message = `🆕 Новый заказ #${orderData.order_number}\n\n👤 Имя: ${orderData.name}\n📱 Телефон: ${orderData.phone}\n📍 Адрес: ${orderData.address}\n\n🍽 Заказ:\n${orderData.items.map((item: any) => {
+    const additions = item.additions ? item.additions.map((add: any) => `   + ${add.name} (+${add.price}₽)`).join('\n') : '';
+    return `• ${item.name} x${item.quantity || 1} - ${item.price}₽${additions ? '\n' + additions : ''}`;
+  }).join('\n')}\n\n🚚 Доставка - ${orderData.deliveryCost}₽\n\n💰 Итого: ${orderData.total}₽${orderData.comment ? `\n\n💬 Комментарий: ${orderData.comment}` : ''}`;
   try {
     const telegramResponse = await fetch(
-      `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
+      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          chat_id: process.env.TELEGRAM_CHAT_ID,
+          chat_id: TELEGRAM_CHAT_ID,
           text: message,
           parse_mode: 'HTML',
         }),
       }
     );
-
     if (!telegramResponse.ok) {
       console.error('Error sending Telegram notification:', await telegramResponse.text());
     } else {
@@ -101,10 +140,13 @@ export async function POST(request: Request) {
     validateOrderData(body);
     const { name, phone, address, items, total, comment } = body;
 
-    // Генерируем номер заказа
-    const lastOrderNumber = getLastOrderNumber();
-    const orderNumber = lastOrderNumber + 1;
-    console.log('Generated order number:', orderNumber);
+    // Получаем номер заказа из Telegram
+    let orderNumber = 1;
+    if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
+      orderNumber = (await getLastOrderNumberFromTelegram()) + 1;
+    } else {
+      await trySendChatIdInstruction();
+    }
 
     // Рассчитываем стоимость доставки
     const deliveryCost = address.toLowerCase().includes('самовывоз') || items.reduce((sum: number, item: any) => {
