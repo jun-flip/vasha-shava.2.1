@@ -1,11 +1,23 @@
 import Database from 'better-sqlite3';
 import path from 'path';
+import fs from 'fs';
 
-// Путь к файлу базы данных
-const dbPath = path.join(process.cwd(), 'orders.db');
+// Определяем путь к базе данных в зависимости от окружения
+const isVercel = process.env.VERCEL === '1';
+const dbPath = isVercel 
+  ? '/tmp/orders.db'  // Временная директория для Vercel
+  : path.join(process.cwd(), 'orders.db');
 
 // Создаем подключение к базе данных
-const db = new Database(dbPath);
+let db: Database.Database;
+
+try {
+  db = new Database(dbPath);
+  console.log(`Database connected to: ${dbPath}`);
+} catch (error) {
+  console.error('Error connecting to database:', error);
+  throw error;
+}
 
 // Инициализация таблиц
 export function initializeDatabase() {
