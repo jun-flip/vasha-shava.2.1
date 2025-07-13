@@ -116,7 +116,7 @@ export default function OrderConfirmationModal({ isOpen, onClose, total, items, 
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 bg-black bg-opacity-50 z-50"
+          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
           onClick={handleClose}
         />
         <motion.div
@@ -124,7 +124,7 @@ export default function OrderConfirmationModal({ isOpen, onClose, total, items, 
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ type: "spring", duration: 0.5 }}
-          className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-[95vw] sm:max-w-md md:max-w-lg"
+          className="relative w-full max-w-[95vw] sm:max-w-md md:max-w-lg mx-auto z-50"
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
